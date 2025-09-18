@@ -523,17 +523,18 @@ function setupRealtimeListeners() {
       (snapshot) => {
         isConnected.value = true;
         
-        // ONLY do full reload for initial load (when we have no assets for this project yet)
+        // Check for initial load OR project switch (both need full reload)
         const currentProjectAssets = assets.value.filter(a => (a.project || 'Spells of Genesis') === selectedProject.value);
         const isInitialLoad = !initialLoaded.value && currentProjectAssets.length === 0;
+        const isProjectSwitch = initialLoaded.value && currentProjectAssets.length === 0;
         
-        if (!snapshot.metadata.fromCache && isInitialLoad) {
+        if (!snapshot.metadata.fromCache && (isInitialLoad || isProjectSwitch)) {
           const projectAssets = snapshot.docs.map(doc => {
             const data = { ...doc.data() };
             return data;
           });
           
-          console.log(`� Loading ${projectAssets.length} assets for ${selectedProject.value}`);
+          console.log(`🔄 Loading ${projectAssets.length} assets for ${selectedProject.value} (${isProjectSwitch ? 'project switch' : 'initial load'})`);
           
           // Remove old project assets and add new ones
           assets.value = assets.value.filter(a => (a.project || 'Spells of Genesis') !== selectedProject.value);
@@ -707,7 +708,15 @@ watch(currentPage, (val) => {
 watch(selectedProject, async () => {
   currentPage.value = 1;
   serverFilterSupported.value = true;
-  initialLoaded.value = false;
+  
+  // For project switches, clear current project assets immediately
+  const wasInitiallyLoaded = initialLoaded.value;
+  if (wasInitiallyLoaded) {
+    // Clear assets for the old project to show loading state
+    assets.value = assets.value.filter(a => (a.project || 'Spells of Genesis') !== selectedProject.value);
+  } else {
+    initialLoaded.value = false;
+  }
   
   // 🔥 Clean up previous listeners before switching projects
   cleanupListeners();
