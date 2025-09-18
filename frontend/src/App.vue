@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-base-200 flex flex-col overflow-hidden">
-    <!-- Global top-of-window loading bar (only during initial full load) -->
+    <!-- Global top-of-window loading bar (during initial load OR project switching) -->
     <div
       v-if="!initialLoaded"
       class="fixed top-0 left-0 right-0 h-1 z-50 bg-green-600/20"
@@ -523,18 +523,17 @@ function setupRealtimeListeners() {
       (snapshot) => {
         isConnected.value = true;
         
-        // Check for initial load OR project switch (both need full reload)
+        // Only do full reload when no assets exist for current project (includes both initial and project switch)
         const currentProjectAssets = assets.value.filter(a => (a.project || 'Spells of Genesis') === selectedProject.value);
-        const isInitialLoad = !initialLoaded.value && currentProjectAssets.length === 0;
-        const isProjectSwitch = initialLoaded.value && currentProjectAssets.length === 0;
+        const needsFullReload = !initialLoaded.value && currentProjectAssets.length === 0;
         
-        if (!snapshot.metadata.fromCache && (isInitialLoad || isProjectSwitch)) {
+        if (!snapshot.metadata.fromCache && needsFullReload) {
           const projectAssets = snapshot.docs.map(doc => {
             const data = { ...doc.data() };
             return data;
           });
           
-          console.log(`🔄 Loading ${projectAssets.length} assets for ${selectedProject.value} (${isProjectSwitch ? 'project switch' : 'initial load'})`);
+          console.log(`🔄 Loading ${projectAssets.length} assets for ${selectedProject.value}`);
           
           // Remove old project assets and add new ones
           assets.value = assets.value.filter(a => (a.project || 'Spells of Genesis') !== selectedProject.value);
@@ -547,6 +546,7 @@ function setupRealtimeListeners() {
           realtimeLoadingProgress.value = 100;
           setTimeout(() => {
             initialLoaded.value = true;
+            // No need to reset projectSwitching since we're using initialLoaded
           }, 300);
         }
         
@@ -704,19 +704,16 @@ watch(currentPage, (val) => {
   try { localStorage.setItem('cpulse.currentPage', String(val)); } catch {}
 });
 
-// On project change: fully reload
+// On project change: fully reload with same loading experience as initial load
 watch(selectedProject, async () => {
   currentPage.value = 1;
   serverFilterSupported.value = true;
   
-  // For project switches, clear current project assets immediately
-  const wasInitiallyLoaded = initialLoaded.value;
-  if (wasInitiallyLoaded) {
-    // Clear assets for the old project to show loading state
-    assets.value = assets.value.filter(a => (a.project || 'Spells of Genesis') !== selectedProject.value);
-  } else {
-    initialLoaded.value = false;
-  }
+  // Always treat project switch like initial load for consistent UX
+  initialLoaded.value = false;
+  
+  // Clear assets for the old project immediately
+  assets.value = assets.value.filter(a => (a.project || 'Spells of Genesis') !== selectedProject.value);
   
   // 🔥 Clean up previous listeners before switching projects
   cleanupListeners();
