@@ -593,7 +593,7 @@ function setupRealtimeListeners() {
           
           console.log(`🔄 Real-time change: ${change.type} for asset ${assetId}${changedFields.length ? ' | Updated: ' + changedFields.join(', ') : ''}`);
           
-          if (change.type === 'added' && !isInitialLoad) {
+          if (change.type === 'added' && initialLoaded.value) {
             // New asset added (only if not during initial load)
             const existingIndex = assets.value.findIndex(a => a.name === assetId);
             if (existingIndex === -1) {
