@@ -1,0 +1,1693 @@
+Introduction
+The TokenScan API supports requesting Counterparty information via requests to /api endpoints. All data is returned in the JSON format
+
+
+The number of records returned on certain endpoints is limited to 100 or 500 to keep transactions small and fast.
+
+Endpoints
+Method	Endpoint	Returns
+GET	/api/address/{address}	Returns basic address information
+GET	/api/asset/{asset}	Returns basic asset information
+GET	/api/balances/{address}	Returns list of asset balances
+GET	/api/bets/{address},{block}	Returns list of 'Bet' transactions
+GET	/api/block/{block}	Returns basic block information
+GET	/api/broadcasts/{address},{block}	Returns list of 'Broadcast' transactions
+GET	/api/burns/{address},{block}	Returns list of 'Burn' transactions
+GET	/api/credits/{address},{block}	Returns list of asset credits
+GET	/api/debits/{address},{block}	Returns list of asset debits
+GET	/api/destructions/{address},{asset},{block}	Returns list of 'Destroy' transactions
+GET	/api/dispensers/{address},{asset},{block}	Returns list of 'Dispenser' transactions
+GET	/api/dispenses/{address},{asset},{block},{transaction}	Returns list of 'Dispense' transactions
+GET	/api/dividends/{address},{asset},{block}	Returns list of 'Dividend' transactions
+GET	/api/history/{address}	Returns list of transaction history
+GET	/api/holders/{asset}	Returns list of holders of an asset
+GET	/api/issuances/{address},{asset},{block}	Returns list of 'Issuance' transactions
+GET	/api/mempool/{address},{asset}	Returns list of 'Unconfirmed / Pending' transactions
+GET	/api/markets	Returns basic information on all markets
+GET	/api/markets/{asset}	Returns basic information on all markets for a given asset
+GET	/api/market/{asset}/{asset}	Returns basic information on the given market
+GET	/api/market/{asset}/{asset}/history	Returns history information on the given market
+GET	/api/market/{asset}/{asset}/history/{address}	Returns history information on the given market and address
+GET	/api/market/{asset}/{asset}/orders/{address}	Returns open orders on the given market and address
+GET	/api/market/{asset}/{asset}/orderbook	Returns open orders on the given market
+GET	/api/network	Returns basic network information
+GET	/api/orders/{address},{asset},{block}	Returns list of 'Order' transactions
+GET	/api/order_matches/{address},{asset},{block}	Returns list of 'Order Match' transactions
+GET	/api/sends/{address},{asset},{block}	Returns list of 'Send' transactions
+POST	/api/send_tx	Returns transaction hash in hex
+GET	/api/tx/{transaction}	Returns transaction information
+GET	/api/utxos/{address}	Returns list of Unspent Transaction Objects (UTXOs)
+Parameters
+Parameter	Type	Description
+{address}	String	A bitcoin address hash
+{asset}	String	A counterparty asset name
+{block}	Integer	A block height
+{page}	Integer	Page of results to request
+{limit}	Integer	Limit results to X per page
+{transaction}	String	A bitcoin transaction hash or index
+Paging
+The TokenScan API supports paging and allows users to customize how many records are returned via {page} and {limit} parameters.
+
+Method	Endpoint
+GET	endpoint/{page}/{limit}
+Examples
+Method	Endpoint	Returns
+GET	/api/sends/XCP/1/100	Returns results 1-100
+GET	/api/sends/XCP/2/100	Returns results 101-200
+GET	/api/sends/XCP/3/100	Returns results 201-300
+ Address
+Method	Endpoint	Returns
+GET	/api/address/{address}	Returns basic address information
+Return Values
+Value	Type	Description
+address	String	Bitcoin address
+assets	Object	Asset information
+ held	Integer	Total number of assets held
+ owned	Integer	Total number of assets owned (address isted as asset owner)
+estimated_value	Object	Estimated wallet value
+ btc	String	Estimated value in Bitcoin (BTC)
+ usd	String	Estimated value in US Dollars (USD)
+ xcp	String	Estimated value in Counterparty (XCP)
+xcp_balance	String	Balance of XCP at this address
+Example Response
+{
+    "address": "14ZfeTmV5koPHfHubuNU7wt4WZfyaJRtGa",
+    "assets": {
+        "held": 0,
+        "owned": 0
+    },
+    "estimated_value": {
+        "btc": "0.02033678",
+        "usd": "37.96",
+        "xcp": "4.10000000"
+    },
+    "xcp_balance": "4.10000000"
+}
+ Asset
+Method	Endpoint	Returns
+GET	/api/asset/{asset}	Returns basic asset information
+Return Values
+Value	Type	Description
+asset	String	Asset name (Ex: PIZZA)
+asset_id	Integer	Encoded asset id (used in transactions)
+asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+description	String	The asset's current description
+divisible	Boolean	Whether the asset is divisible or not
+estimated_value	Object	Estimated value for 1 token/coin
+ btc	String	Estimated value in Bitcoin (BTC)
+ usd	String	Estimated value in US Dollars (USD)
+ xcp	String	Estimated value in Counterparty (XCP)
+issuer	String	The asset's original owner (i.e. issuer)
+locked	Boolean	Whether the asset is locked (future issuances of supply prohibited)
+owner	String	The address that currently owns the asset (i.e. has issuance rights to it)
+supply	String	The total amount of asset tokens issued
+type	String	Asset Type (named, numeric, subasset)
+Example Response
+{
+    "asset": "PEPECASH",
+    "asset_id": 121892899915,
+    "asset_longname": "",
+    "description": "http://rarepepedirectory.com/json/pc.json",
+    "divisible": true,
+    "estimated_value": {
+        "btc": "0.00000595",
+        "usd": "0.01",
+        "xcp": "0.00120000"
+    },
+    "issuer": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+    "locked": true,
+    "owner": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+    "supply": "1000000000.00000000",
+    "type": "named"
+}
+ Balances
+Method	Endpoint	Returns
+GET	/api/balances/{address}	Returns list of asset balances
+Return Values
+Value	Type	Description
+address	String	Bitcoin address
+data	Array	Address balance data
+ asset	String	Asset name (Ex: PIZZA)
+ asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ description	String	The asset's current description
+ estimated_value	Object	Estimated value
+     btc	String	Estimated value in Bitcoin (BTC)
+     usd	String	Estimated value in US Dollars (USD)
+     xcp	String	Estimated value in Counterparty (XCP)
+ quantity	String	Quantity of asset held
+total	Integer	Total number of asset balances
+Example Response
+{
+    "address": "1Donatet2LrNpuWByAnH8gc9Wh9zSzZuLC",
+    "data": [{
+            "asset": "COVALC",
+            "asset_longname": "",
+            "description": "xcp.coindaddy.io/COVALC.json",
+            "estimated_value": {
+                "btc": "0.00000000",
+                "usd": "0.00",
+                "xcp": "0.00000000"
+            },
+            "quantity": "100.00000000"
+        },
+        {
+            "asset": "PEPECASH",
+            "asset_longname": "",
+            "description": "http://rarepepedirectory.com/json/pc.json",
+            "estimated_value": {
+                "btc": "3.59794500",
+                "usd": "8913.53",
+                "xcp": "780.00000000"
+            },
+            "quantity": "650000.00000000"
+        },
+        {
+            "asset": "XCP",
+            "asset_longname": "",
+            "description": "",
+            "estimated_value": {
+                "btc": "0.73573363",
+                "usd": "1822.70",
+                "xcp": "159.50000000"
+            },
+            "quantity": "159.50000000"
+        },
+        ...
+    ],
+    "total": 6
+}
+ Bets
+Method	Endpoint	Returns
+GET	/api/bets/{address}	Returns list of 'Bet' transactions
+GET	/api/bets/{block}	Returns list of 'Bet' transactions
+Return Values
+Value	Type	Description
+data	Array	Bet data
+ bet_type	Integer	Type of Bet (0=Bullish, 1=Bearish, 2=Equal, 3=NotEqual)
+ block_index	Integer	Block number containing the transaction
+ counterwager_quantity	String	The counterwager quantity
+ counterwager_remaining	String	The counterwager quantity remaining
+ deadline	Integer	The deadline when the feed expires
+ expiration	Integer	The number of blocks after which the bet expires if it remains unmatched
+ expire_index	Integer	The block at which the bet expires if it remains unmatched
+ fee	String	How much of this bet on this feed should go to its operator; a fraction of 1, (i.e. 0.05 is five percent).
+ feed_address	String	The address that hosts the feed that was bet on
+ leverage	Integer	Leverage, as a fraction of 5040
+ source	String	the address that made the bet
+ status	String	Status of the transaction
+ target_value	Integer	Target value for Equal/NotEqual bet
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+ wager_quantity	String	The wager quantity
+ wager_remaining	String	The wager quantity remaining
+total	Integer	Total number of bets
+Example Response
+{
+    "data": [{
+            "bet_type": 3,
+            "block_index": 461985,
+            "counterwager_quantity": "3.84615384",
+            "counterwager_remaining": "3.84615384",
+            "deadline": 1492182000,
+            "expiration": 417,
+            "expire_index": 462402,
+            "fee": "0.03000000",
+            "feed_address": "1BetXQ5w9mMmJosZ21jUtrebdpgMhYQUaZ",
+            "leverage": 5040,
+            "source": "1A9kQfFmz5UvVmhqSZgRcsfFT1HVE2MYNX",
+            "status": "expired",
+            "target_value": 7,
+            "timestamp": 1492254524,
+            "tx_hash": "a1d575ddd862f6b26a0730caa78fc8892ea21d56e10dd265a3f57970501a8929",
+            "tx_index": 883694,
+            "wager_quantity": "50.00000000",
+            "wager_remaining": "50.00000000"
+        },
+        {
+            "bet_type": 3,
+            "block_index": 460217,
+            "counterwager_quantity": "7.14285713",
+            "counterwager_remaining": "6.59125713",
+            "deadline": 1491577200,
+            "expiration": 558,
+            "expire_index": 460775,
+            "fee": "0.03000000",
+            "feed_address": "1BetXQ5w9mMmJosZ21jUtrebdpgMhYQUaZ",
+            "leverage": 5040,
+            "source": "1A9kQfFmz5UvVmhqSZgRcsfFT1HVE2MYNX",
+            "status": "expired",
+            "target_value": 7,
+            "timestamp": 1492254524,
+            "tx_hash": "f51d8ea6707b9aeafe8291461ce927d40e9f6cad11c9c831972ac61be07bea3c",
+            "tx_index": 866660,
+            "wager_quantity": "100.00000000",
+            "wager_remaining": "92.27760002"
+        },
+        ...
+    ],
+    "total": 4
+}
+ Block
+Method	Endpoint	Returns
+GET	/api/block/{block}	Returns basic block information
+Return Values
+Value	Type	Description
+block_hash	String	The block hash identifier
+block_index	Integer	The block index (i.e. block height)
+difficulty	Integer	Bitcoin network mining difficulty
+ledger_hash	String	The ledger hash identifier
+messages_hash	String	The message hash identifier
+previous_block_hash	String	The previous block hash identifier
+timestamp	Integer	A UNIX timestamp of when the block was processed by the network
+txlist_hash	String	The transaction list hash identifier
+Example Response
+{
+    "block_hash": "000000000000000001660793748d47f2232874dbae1967fe66b5761def4b930d",
+    "block_index": 461985,
+    "difficulty": 520809000000,
+    "ledger_hash": "707626d304fd47ea8ff1c14c61cd8fc3028fe09085cff1c693e86ec36e343035",
+    "messages_hash": "4c3bd6dc24104e16e983f9c3d7c4d094cd044aac0efd5061fb34ac88a0a15ac9",
+    "previous_block_hash": "0000000000000000009ce6b1404411a1a58d0cc94ad75443e09d9352131b8b3d",
+    "timestamp": 1492254524,
+    "txlist_hash": "eb0fd9264404279eefa9644166079e39352e195de420a4b3696869b11dc11e06"
+}
+ Broadcasts
+Method	Endpoint	Returns
+GET	/api/broadcasts/{address}	Returns list of 'Broadcast' transactions
+GET	/api/broadcasts/{block}	Returns list of 'Broadcast' transactions
+Return Values
+Value	Type	Description
+data	Array	Broadcasts data
+ block_index	Integer	Block number containing the transaction
+ fee	String	How much of every bet on this feed should go to its operator; a fraction of 1, (i.e. 0.05 is five percent).
+ locked	Boolean	Is the feed locked
+ source	String	Source address where broadcast originated
+ status	String	Status of the transaction
+ text	String	The textual part of the broadcast
+ timestamp	Integer	The timestamp of the broadcast, in Unix time.
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+ value	String	The broadcast value
+total	Integer	Total number of broadcasts
+Example Response
+{
+    "data": [{
+            "block_index": 462607,
+            "fee": "0.00000000",
+            "locked": false,
+            "source": "1Lfm6jXgCQi8LvjpgFHa2F4hdr1uJVa5t4",
+            "status": "valid",
+            "text": "XCPELECTION2017 5",
+            "timestamp": 1492630804,
+            "tx_hash": "17ae88e23b69c9361fd6eb53df4da5f5fbb4f425fd12d72fa4eac1d816ac2e75",
+            "tx_index": 888831,
+            "value": "1000"
+        },
+        {
+            "block_index": 462607,
+            "fee": "0.00000000",
+            "locked": false,
+            "source": "1Lfm6jXgCQi8LvjpgFHa2F4hdr1uJVa5t4",
+            "status": "valid",
+            "text": "XCPELECTION2017 4",
+            "timestamp": 1492630784,
+            "tx_hash": "81244be703af2508c9163faab906a5e381ec1928399685c01d0aa857cf19fcdf",
+            "tx_index": 888830,
+            "value": "1000"
+        },
+        ...
+    ],
+    "total": 13
+}
+ Burns
+Method	Endpoint	Returns
+GET	/api/burns/{address}	Returns list of 'Burn' transactions
+GET	/api/burns/{block}	Returns list of 'Burn' transactions
+Return Values
+Value	Type	Description
+data	Array	Broadcasts data
+ block_index	Integer	Block number containing the transaction
+ burned	String	The amount of Bitcoin (BTC) burned
+ earned	String	The amount of Counterparty (XCP) earned
+ source	String	Source address where broadcast originated
+ status	String	Status of the transaction
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+total	Integer	Total number of burns
+Example Response
+{
+    "data": [{
+            "block_index": 283809,
+            "burned": "1.00000000",
+            "earned": "1000.09090909",
+            "source": "1EU6VM7zkA9qDw8ReFKHRpSSHJvbuXYNhq",
+            "status": "valid",
+            "timestamp": 1492254524,
+            "tx_hash": "ad6609edbdb3b951627302f65df06636f2535680d69d2ee98f59af05cedf0d94",
+            "tx_index": 3069
+        },
+        {
+            "block_index": 283809,
+            "burned": "1.00000000",
+            "earned": "1000.09090909",
+            "source": "1NiYuG55KmBMQrHBV6fchPmkKYDTeVp7GB",
+            "timestamp": 1492254524,
+            "status": "valid",
+            "tx_hash": "ab7f2777b3b0ebd3330cd7ccf43af87680c9a43072d0a7c8f24a64bd330bc8ba",
+            "tx_index": 3068
+        },
+        ...
+    ],
+    "total": 7
+}
+ Credits
+Method	Endpoint	Returns
+GET	/api/credits/{address}	Returns list of asset credits
+GET	/api/credits/{block}	Returns list of asset credits
+Return Values
+Value	Type	Description
+data	Array	Credits data
+ action	String	Action related to the credit (Ex: send, open match, dividend, etc)
+ asset	String	Asset name (Ex: PIZZA)
+ block_index	Integer	Block number containing the event
+ event	String	Transaction Hash
+ quantity	String	Quantity of asset credited
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+total	Integer	Total number of credits
+Example Response
+{
+    "data": [{
+            "action": "order match",
+            "asset": "SHARKSHYLOCK",
+            "block_index": 535028,
+            "event": "e54d28ead5a092ccdcb1bfbc6113b8acd0112a85cf5b3a69d4a0d328ec320f8b_c0fe3613937f5eefcafb10fd28e2626ff19b0cd6fd20458958359999932124af",
+            "quantity": "10",
+            "timestamp": 1533313089,
+        },
+        {
+            "action": "dividend",
+            "asset": "MAFIACASH",
+            "block_index": 534723,
+            "event": "91f5ddd1722173e6f5dc97d34db41fa688656562765a2b442bc4b2862508e0c3",
+            "quantity": "48097.16599190",
+            "timestamp": 1533146986
+        },
+        {
+            "action": "send",
+            "asset": "MAFIACASH",
+            "block_index": 534721,
+            "event": "e5e719bb7f2c52e842b3ef57f4b6ce251da36129899c499fcd7b36a0d9b02d30",
+            "quantity": "5000.00000000",
+            "timestamp": 1533145929,
+        },
+        ...
+    ],
+    "total": 52
+}
+ Debits
+Method	Endpoint	Returns
+GET	/api/debits/{address}	Returns list of asset debits
+GET	/api/debits/{block}	Returns list of asset debits
+Return Values
+Value	Type	Description
+data	Array	Debits data
+ action	String	Action related to the debit (Ex: send, open match, dividend, etc)
+ asset	String	Asset name (Ex: PIZZA)
+ block_index	Integer	Block number containing the debit
+ event	String	Transaction Hash
+ quantity	String	Quantity of asset debited
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+total	Integer	Total number of debits
+Example Response
+{
+    "data": [{
+            "action": "open order",
+            "asset": "MAFIACASH",
+            "block_index": 522837,
+            "event": "52f462bd33a36c803b740965934b658d4476e7c6f4235b52f8c92cfe9281485f",
+            "quantity": "1000.00000000",
+            "timestamp": 1526418615
+        },
+        {
+            "action": "send",
+            "asset": "TOMMYGUN",
+            "block_index": 522977,
+            "event": "c8e0a97855a760e27e07acfc0ab0bd4bdfd3dc22bf157e782dc0ba3528bca1df",
+            "quantity": "1",
+            "timestamp": 1526489316
+        },
+        {
+            "action": "issuance fee",
+            "asset": "XCP",
+            "block_index": 533732,
+            "event": "6b8287af710147a7898dcc9dd0d0e009210f275bfceb0d99cf6e591da8fac4f9",
+            "quantity": "0.50000000",
+            "timestamp": 1532585644
+        },
+        ...
+    ],
+    "total": 167
+}
+ Destructions
+Method	Endpoint	Returns
+GET	/api/destructions/{address}	Returns list of 'destroy' transactions
+GET	/api/destructions/{asset}	Returns list of 'destroy' transactions
+GET	/api/destructions/{block}	Returns list of 'destroy' transactions
+Return Values
+Value	Type	Description
+data	Array	Dividend data
+ asset	String	Asset name (Ex: PIZZA)
+ asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ block_index	Integer	Block number containing the transaction
+ quantity	String	Quantity of asset destroyed
+ source	String	Source address
+ status	String	Status of the transaction
+ tag	String	Optional text or hex encoded memo message
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+total	Integer	Total number of destructions
+Example Response
+{
+  "data": [
+    {
+      "asset": "A7355042031627182347",
+      "asset_longname": "RUMPSHAKER.IN.YA.FACE",
+      "block_index": 1904053,
+      "quantity": "1.00000000",
+      "source": "mvThcDEbeqog2aJ7JNj1FefUPaNdYYGqHt",
+      "status": "valid",
+      "tag": "",
+      "timestamp": 1610659458,
+      "tx_hash": "5d9b6c893bea58158cb6dcfa9b7f21bd068c35ed1cf775619b4e97f9578591bf",
+      "tx_index": "26535"
+    },
+    {
+      "asset": "XCP",
+      "asset_longname": "",
+      "block_index": 1904048,
+      "quantity": "0.10000000",
+      "source": "mvThcDEbeqog2aJ7JNj1FefUPaNdYYGqHt",
+      "status": "valid",
+      "tag": "",
+      "timestamp": 1610656295,
+      "tx_hash": "39a5e43de484d59a5bc37819c4e25502c69f1fa0f521173adf40603b133039fc",
+      "tx_index": "26534"
+    }
+  ],
+  "total": 2
+}
+ Dispensers
+Method	Endpoint	Returns
+GET	/api/dispensers/{address}	Returns list of dispensers for a given address
+GET	/api/dispensers/{asset}	Returns list of dispensers for a given asset
+GET	/api/dispensers/{block}	Returns list of dispensers for a given block
+GET	/api/dispensers/{address}?status=open	Returns list of open dispensers for a given address
+GET	/api/dispensers/{asset}?status=open	Returns list of open dispensers for a given asset
+GET	/api/dispensers/{block}?status=open	Returns list of open dispensers for a given block
+Query Values
+Value	Type	Description
+status	String	Status of the dispensers (ie. open/closed)
+Return Values
+Value	Type	Description
+data	Array	Dividend data
+ asset	String	Asset name (Ex: PIZZA)
+ asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ block_index	Integer	Block number containing the transaction
+ give_quantity	String	Quantity of asset to dispense
+ escrow_quantity	String	Quantity of asset to escrow
+ give_remaining	String	Quantity left in the dispenser
+ satoshirate	String	Quantity of BTC payment required to dispense
+ source	String	Source address
+ oracle_address	String	The address that is being used as the oracle
+ oracle_price	String	The BTC price broadcast by the oracle
+ oracle_price_last_updated	Integer	Block number the oracle was last updated
+ oracle_price_block_time	Integer	Timestamp when the oracle was last updated
+ fiat_price	String	The FIAT price per dispense
+ fiat_unit	String	The FIAT unit being used
+ satoshi_price	String	The BTC price required for a dispense
+ status	String	Status of the dispenser (0=Open, 10=Closed)
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+total	Integer	Total number of dispeners
+Example Response
+{
+        "data": [{
+              "asset": "BACONTITS",
+              "asset_longname": "",
+              "block_index": 2342113,
+              "escrow_quantity": "10.00000000",
+              "give_quantity": "1.00000000",
+              "give_remaining": "10.00000000",
+              "satoshi_price": "0.00001500",
+              "satoshirate": "0.00001500",
+              "source": "tb1q50kxp76j9l0k9jgwasvcz4mcz0v03fv2wj67a4",
+              "status": "10",
+              "timestamp": 1660771334,
+              "tx_hash": "f9654d95617c7e7d44e48d6a84b8c64435f48bcabad168ecfed99b99ff573158",
+              "tx_index": "29420"
+            },
+            {
+              "asset": "BACONTITS",
+              "asset_longname": "",
+              "block_index": 2342111,
+              "escrow_quantity": "10.00000000",
+              "fiat_price": "15.00",
+              "fiat_unit": "USD",
+              "give_quantity": "1.00000000",
+              "give_remaining": "10.00000000",
+              "oracle_address": "mmUSDD66Q883cnYygZ5v26xaY35U7S9uwh",
+              "oracle_price": "20270.00",
+              "oracle_price_block_time": "1661560417",
+              "oracle_price_last_updated": "2344160",
+              "satoshi_price": "0.00074001",
+              "satoshirate": "0.00001500",
+              "source": "mvThcDEbeqog2aJ7JNj1FefUPaNdYYGqHt",
+              "status": "10",
+              "timestamp": 1660771242,
+              "tx_hash": "208084dac42e43e0256f63c94932cf880023d265d636e18b0b616b13f6858e10",
+              "tx_index": "29419"
+            },
+        ...
+    ],
+    "total": 52
+}
+ Dispenses
+Method	Endpoint	Returns
+GET	/api/dispenses/{address},{asset},{block},{transaction}	Returns list of 'Dispense' transactions
+Return Values
+Value	Type	Description
+data	Array	Dividend data
+ address	String	Address which received the dispensed asset/token
+ asset	String	Asset name (Ex: PIZZA)
+ asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ block_index	Integer	Block number containing the transaction
+ dispenser	String	Transaction hash of dispenser
+ quantity	String	Quantity of asset dispensed
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+total	Integer	Total number of dispeners
+Example Response
+{
+    "data": [{
+            "address": "1DevGw4eJWtGZWNjQXagEVnP3XGXH4o6dT",
+            "asset": "PEPECAKEFACE",
+            "asset_longname": "",
+            "block_index": 601879,
+            "dispenser": "a0101626f11fc1be130a30323b9b2cff34107dab85586a501f4e0cc38b0d4fad",
+            "quantity": "2",
+            "timestamp": 1572592031,
+            "tx_hash": "c2cbbce8802864ca3dcb0b6a278f2c3fb927910db4da2a3d08f23f9df7d6d876"
+        },
+        {
+            "address": "1DevGw4eJWtGZWNjQXagEVnP3XGXH4o6dT",
+            "asset": "BTTLFTHESUBS",
+            "asset_longname": "",
+            "block_index": 601879,
+            "dispenser": "f981d62ca08ca23bdfd24b147e6d7fad8682a94844940e082158182818af67aa",
+            "quantity": "1",
+            "timestamp": 1572592031,
+            "tx_hash": "c2cbbce8802864ca3dcb0b6a278f2c3fb927910db4da2a3d08f23f9df7d6d876"
+        },
+        ...
+    ],
+    "total": 3
+}
+ Dividends
+Method	Endpoint	Returns
+GET	/api/dividends/{address}	Returns list of 'Dividend' transactions
+GET	/api/dividends/{asset}	Returns list of 'Dividend' transactions
+GET	/api/dividends/{block}	Returns list of 'Dividend' transactions
+Return Values
+Value	Type	Description
+data	Array	Dividend data
+ asset	String	Asset name (Ex: PIZZA)
+ asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ block_index	Integer	Block number containing the transaction
+ dividend_asset	String	Asset name (Ex: PIZZA)
+ dividend_asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ fee_paid	String	The fee paid
+ quantity_per_unit	String	The amount of dividend_asset rewarded.
+ source	String	Source address
+ status	String	Status of the transaction
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+total	Integer	Total number of dividends
+Example Response
+{
+    "data": [{
+            "asset": "HOMMALICOIN",
+            "asset_longname": "",
+            "block_index": 465743,
+            "dividend_asset": "HOMMALICOIN",
+            "dividend_asset_longname": "",
+            "fee_paid": "0.11120000",
+            "quantity_per_unit": "0.00100000",
+            "source": "17tmQVnoBn5MUvvdQ4ev4vyiXZnkdt9RbS",
+            "status": "valid",
+            "timestamp": 1492254524,
+            "tx_hash": "908b4df500e2390b14a7211fc0471a2cffbcb0fd5eda7486232d126bb8b5f721",
+            "tx_index": 915292
+        },
+        {
+            "asset": "HOMMALICOIN",
+            "asset_longname": "",
+            "block_index": 464307,
+            "dividend_asset": "XCP",
+            "dividend_asset_longname": "",
+            "fee_paid": "0.11120000",
+            "quantity_per_unit": "0.00011000",
+            "source": "17tmQVnoBn5MUvvdQ4ev4vyiXZnkdt9RbS",
+            "status": "valid",
+            "timestamp": 1492254524,
+            "tx_hash": "8dfc8dd106f3a0032cf5b95280782d8685dc9eb1a6b7fe0b1a92feeb8ee564e2",
+            "tx_index": 902813
+        },
+        ...
+    ],
+    "total": 52
+}
+ History
+Method	Endpoint	Returns
+GET	/api/history/{address}	Returns list of transaction history
+The returned values will vary based on the transaction type. The values that will be consistent in every transaction are listed below.
+Return Values
+Value	Type	Description
+data	Array	Transaction history data
+ source	String	Source address
+ status	String	Status of the transaction
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+ tx_type	String	The transaction type (Bet, Broadcast, Burn, Dividend, Issuance, Order, Send)
+total	Integer	Total number of transactions
+Example Response
+
+  "data": [
+    {
+      "block_index": 500062,
+      "expiration": 1000,
+      "expire_index": 501062,
+      "fee_provided": "0.00089075",
+      "fee_provided_remaining": "0.00089075",
+      "fee_required": "0.00020000",
+      "fee_required_remaining": "0.00020000",
+      "get_asset": "VACUS",
+      "get_asset_longname": "",
+      "get_quantity": "2680",
+      "get_remaining": "0",
+      "give_asset": "XCP",
+      "give_asset_longname": "",
+      "give_quantity": "9.09592000",
+      "give_remaining": "0.00000000",
+      "source": "1JsYuj7bwuox8rdUpspAgrnMTY7qgF6BnQ",
+      "status": "filled",
+      "timestamp": 1513649725,
+      "tx_hash": "6f1f17231e2ec9283a821fb133b3dc7a2cb9f44cddb072e0e1471214775c265b",
+      "tx_index": 1142497,
+      "tx_type": "Order"
+    },
+    {
+      "asset": "XCP",
+      "asset_longname": "",
+      "block_index": 500059,
+      "destination": "1JsYuj7bwuox8rdUpspAgrnMTY7qgF6BnQ",
+      "memo": "",
+      "quantity": "9.10000000",
+      "source": "1PNkBxnz5ePW8FeK6CSs8V2fGHcN9B6HNk",
+      "status": "valid",
+      "timestamp": 1513648186,
+      "tx_hash": "46ac391ccf80807940b15740300b34a7b7697157782adfc1cc9fced44c7713c3",
+      "tx_index": 1142479,
+      "tx_type": "Send"
+    }
+  ],
+  "total": 2
+}
+ Holders
+Method	Endpoint	Returns
+GET	/api/holders/{asset}	Returns list of holders of an asset
+Return Values
+Value	Type	Description
+asset	String	Asset name (Ex: PIZZA)
+asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+data	Array	Holder data
+ address	String	Bitcoin address
+ estimated_value	Object	Estimated value
+     btc	String	Estimated value in Bitcoin (BTC)
+     usd	String	Estimated value in US Dollars (USD)
+     xcp	String	Estimated value in Counterparty (XCP)
+ percentage	String	Percentage of total supply
+ quantity	String	Quantity of asset held
+total	Integer	Total number of holders
+Example Response
+{
+    "asset": "PEPECASH",
+    "asset_longname": "",
+    "data": [{
+            "address": "1BurnPepexxxxxxxxxxxxxxxxxxxAK33R",
+            "estimated_value": {
+                "btc": "1653.70218485",
+                "usd": "3107535.90",
+                "xcp": "363020.98938757"
+            },
+            "percentage": "30.25174912",
+            "quantity": "302517491.15631030"
+        },
+        {
+            "address": "1AqUTSTGB6coR5AYcwFFM6nXoULapXqtdL",
+            "estimated_value": {
+                "btc": "564.41265737",
+                "usd": "1060609.71",
+                "xcp": "123899.96407927"
+            },
+            "percentage": "10.32499701",
+            "quantity": "103249970.06606090"
+        },
+        {
+            "address": "1PNkBxnz5ePW8FeK6CSs8V2fGHcN9B6HNk",
+            "estimated_value": {
+                "btc": "266.11049232",
+                "usd": "500058.55",
+                "xcp": "58416.62125878"
+            },
+            "percentage": "4.86805177",
+            "quantity": "48680517.71565206"
+        },
+        ...
+    ],
+    "total": 1725
+}
+ Issuances
+Method	Endpoint	Returns
+GET	/api/issuances/{address}	Returns list of 'Issuance' transactions
+GET	/api/issuances/{asset}	Returns list of 'Issuance' transactions
+GET	/api/issuances/{block}	Returns list of 'Issuance' transactions
+Return Values
+Value	Type	Description
+data	Array	Dividend data
+ asset	String	Asset name (Ex: PIZZA)
+ asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ block_index	Integer	Block number containing the transaction
+ description	String	The asset's description
+ divisible	Boolean	Whether the asset is divisible or not
+ fee_paid	String	The fee paid
+ issuer	String	The asset's original owner (i.e. issuer)
+ locked	Boolean	Whether the asset is locked (future issuances of supply prohibited)
+ quantity	String	Quantity of asset held
+ source	String	The address that made the issuance
+ status	String	Status of the transaction
+ transfer	Boolean	Whether issuance is transfering ownership to a new address
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+total	Integer	Total number of issuances
+Example Response
+{
+    "data": [{
+            "asset": "PEPECASH",
+            "asset_longname": "",
+            "block_index": 431786,
+            "description": "http://rarepepedirectory.com/json/pc.json",
+            "divisible": true,
+            "fee_paid": "0.00000000",
+            "issuer": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+            "locked": true,
+            "quantity": "0.00000000",
+            "source": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+            "status": "valid",
+            "transfer": false,
+            "timestamp": 1492254524,
+            "tx_hash": "2881e92352e954872e21f1266271446b392466056b77fa7f7a223739e5728147",
+            "tx_index": 585733
+        },
+        {
+            "asset": "PEPECASH",
+            "asset_longname": "",
+            "block_index": 430404,
+            "description": "http://rarepepedirectory.com/json/pc.json",
+            "divisible": true,
+            "fee_paid": "0.00000000",
+            "issuer": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+            "locked": false,
+            "quantity": "0.00000000",
+            "source": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+            "status": "valid",
+            "transfer": false,
+            "timestamp": 1492254524,
+            "tx_hash": "c28bde10ebe3528af79d24d25ee9ac7e10bfab6a4fc0c60ac9e478250f0ddfc5",
+            "tx_index": 576851
+        },
+        {
+            "asset": "PEPECASH",
+            "asset_longname": "",
+            "block_index": 430263,
+            "description": "",
+            "divisible": true,
+            "fee_paid": "0.50000000",
+            "issuer": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+            "locked": false,
+            "quantity": "1000000000.00000000",
+            "source": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+            "status": "valid",
+            "transfer": false,
+            "timestamp": 1492254524,
+            "tx_hash": "4a8cd9eeb98000ff763f7334429b4453d627a7064d073f0ee5b4d0475015b1d8",
+            "tx_index": 573564
+        }
+    ],
+    "total": 3
+}
+ Markets
+Method	Endpoint	Returns
+GET	/api/markets	Returns basic information on all markets
+GET	/api/markets/{asset}	Returns basic information on all markets for a given asset
+Return Values
+Value	Type	Description
+data	Array	Market data
+ name	String	Market name (Ex: BTC/XCP)
+ longname	String	Market Longname, if any (Ex: PIZZA.DOMINOS/XCP)
+ 24hour	Object	Information on the last 24 hours
+     high	String	Highest Price
+     low	String	Lowest Price
+     percent	String	Percentage Change
+     volume	String	Volume for both market assets (Ex: 1.23456789|0.00000001 )
+ price	Object	Information on the price
+     ask	String	Lowest price sellers are accepting
+     bid	String	Highest price buyers are paying
+     last	String	Price at the time of the last trade
+updated	Integer	Unix time for the last time this market information was updated
+total	Integer	Total number of markets
+Example Response
+{
+    "data": [{
+        "name": "XFCCOIN/XCP",
+        "longname": "",
+        "24hour": {
+            "high": "0.00135555",
+            "low": "0.00135555",
+            "percent": "-3.28",
+            "volume": "2766.00000000|3.74945130"
+        },
+        "price": {
+            "ask": "0.00135000",
+            "bid": "0.00135000",
+            "last": "0.00135555"
+        },
+        "updated": 1508535411
+    },{
+        "name": "RAREPEPEPRTY/XCP",
+        "longname": "",
+        "24hour": {
+            "high": "1.50000000",
+            "low": "1.50000000",
+            "percent": "0.00",
+            "volume": "0|0.00000000"
+        },
+        "price": {
+            "ask": "2.00000000",
+            "bid": "1.25000000",
+            "last": "1.50000000"
+        },
+        "updated": 1508535411
+    }],
+    "total": 2
+}
+ Market
+Method	Endpoint	Returns
+GET	/api/market/{asset}/{asset}	Returns basic information on the given market
+Return Values
+Value	Type	Description
+name	String	Market name (Ex: BTC/XCP)
+longname	String	Market Longname, if any (Ex: PIZZA.DOMINOS/XCP)
+24hour	Object	Information on the last 24 hours
+ high	String	Highest Price
+ low	String	Lowest Price
+ percent	String	Percentage Change
+ volume	String	Volume for both market assets (Ex: 1.23456789|0.00000001 )
+price	Object	Information on the price
+ ask	String	Lowest price sellers are accepting
+ bid	String	Highest price buyers are paying
+ last	String	Price at the time of the last trade
+updated	Integer	Unix time for the last time this market information was updated
+Example Response
+{
+    "name": "RAREPEPEPRTY/XCP",
+    "longname": "",
+    "24hour": {
+        "high": "1.50000000",
+        "low": "1.50000000",
+        "percent": "0.00",
+        "volume": "0|0.00000000"
+    },
+    "price": {
+        "ask": "2.00000000",
+        "bid": "1.25000000",
+        "last": "1.50000000"
+    },
+    "updated": 1508535411
+}
+ Market History
+Method	Endpoint	Returns
+GET	/api/market/{asset}/{asset}/history	Returns history information on the given market
+GET	/api/market/{asset}/{asset}/history/{address}	Returns history information on the given market and address
+Return Values
+Value	Type	Description
+data	Array	Market data
+ amount	String	Amount sold
+ price	String	Price that was paid
+ total	String	Total amount paid
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_index	Integer	Transaction Index
+ type	String	Type of order (buy or sell)
+total	Integer	Total number of orders executed
+Example Response
+{
+    "data": [{
+        "amount": "18200.00000000",
+        "price": "0.00156100",
+        "timestamp": 1509520334,
+        "total": "28.41020000",
+        "tx_index": 1108859,
+        "type": "buy"
+    }, {
+        "amount": "500.00000001",
+        "price": "0.00229314",
+        "timestamp": 1509326370,
+        "total": "1.14657000",
+        "tx_index": 1107449,
+        "type": "sell"
+  }]
+   "total": 2
+}
+ Market Orders
+Method	Endpoint	Returns
+GET	/api/market/{asset}/{asset}/orders/{address}	Returns open orders on the given market and address
+Return Values
+Value	Type	Description
+data	Array	Market data
+ amount	String	Amount being sold
+ expires	Integer	Block index when order expires
+ price	String	Price that will be paid
+ total	String	Total amount that will paid
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_index	Integer	Transaction Index
+ type	String	Type of order (buy or sell)
+total	Integer	Total number of open orders
+Example Response
+{
+    "data": [{
+      "amount": "4.75651343",
+      "expires": 500959,
+      "price": "252.07965716",
+      "timestamp": 1513602213,
+      "total": "1199.02027474",
+      "tx_hash": "a8e2da346856613417c23a28d4c53c79308a43bcc714c1b1bc8bce8f11287021",
+      "tx_index": 1142015,
+      "type": "buy"
+    }]
+   "total": 1
+}
+ Market Orderbook
+Method	Endpoint	Returns
+GET	/api/market/{asset}/{asset}/orderbook	Returns open orders on the given market
+GET	/api/market/{asset}/{asset}/orderbook/{address}	Returns open orders on the given market and address
+Return Values
+Value	Type	Description
+asks	Array	Array of market asks (Price, Amount)
+bids	Array	Array of market bids (Price, Amount)
+Example Response
+{
+    "asks": [
+        ["0.00210000", "617.00000000"],
+        ["0.00229314", "8107.02512743"],
+        ["0.00320000", "4000.00000000"],
+        ["0.00320100", "700.00000000"],
+        ["0.00330000", "2200.00000000"]
+    ],
+    "bids": [
+        ["0.00156100", "19000.00000000"],
+        ["0.00135700", "130000.00000000"],
+        ["0.00135600", "4145.21328171"],
+        ["0.00135550", "1000.00000000"],
+        ["0.00135500", "27550.73538745"]
+    ]
+}
+ Mempool
+Method	Endpoint	Returns
+GET	/api/mempool/{address}	Returns list of 'Mempool' transactions
+GET	/api/mempool/{asset}	Returns list of 'Mempool' transactions
+Example Response
+{
+    "data": [{
+            "asset": "PEPECASH",
+            "destination": "1AqUTSTGB6coR5AYcwFFM6nXoULapXqtdL",
+            "quantity": "2500.00000000",
+            "source": "1FWHba3MmNQdngefndtyWd8VAJcPTmf98j",
+            "timestamp": 1496022544,
+            "tx_hash": "ec8c90d01f58a7678f4ad0f5fbd8ffa9b2f9b979aa6facb7aa3fbc5d0b135f83",
+            "tx_type": "Send"
+        },
+        {
+            "expiration": 4320,
+            "fee_provided": "0.00002107",
+            "fee_provided_remaining": "0.00002107",
+            "fee_remaining": "0.00000000",
+            "fee_required": "0.00020000",
+            "fee_required_remaining": "0.00020000",
+            "get_asset": "XCP",
+            "get_quantity": "0.42212700",
+            "get_remaining": "0.42212700",
+            "give_asset": "PEPECASH",
+            "give_quantity": "279.00000000",
+            "give_remaining": "279.00000000",
+            "source": "1KJRe4vp9j7AoD86c6VcHAQsRsHm5qZUj9",
+            "timestamp": 1496021763,
+            "tx_hash": "4d79c4613ecfed8b1b681909aa5ba26958da3c2e7de851bf03b0b49dabadc4e6",
+            "tx_type": "Order"
+        },
+        ...
+    ],
+    "total": 253
+}
+ Network
+Method	Endpoint	Returns
+GET	/api/network	Returns basic network information
+Return Values
+Value	Type	Description
+currency_info	Array	Currency information on Bitcoin (BTC) & Counterparty (XCP) from Coinmarketcap.com
+network_info	Object	Network information on Bitcoin network
+ mainnet	Object	Network information on Mainnet
+ testnet	Object	Network information on Testnet
+     block_height	Integer	Current block height
+     tx_index	Integer	Total number of Counterparty transactions
+     unconfirmed	Object	Unconfirmed transaction Information
+         btc	Integer	Number of unconfirmed Bitcoin transactions
+         xcp	Integer	Number of unconfirmed Counterparty transactions
+fee_info	Object	Bitcoin (BTC) fee information
+ optimal	Integer	Lowest possible fee that has more than 75% chance of getting into the next block
+ low_priority	Integer	Lowest possible fee that has more than 75% chance of getting into a block within 2 blocks
+ min_relay_fee	Integer	Minimum fee required to relay a transaction.
+Example Response
+{
+    "currency_info": [{
+            "24h_volume_usd": "890195000.0",
+            "available_supply": "16337825.0",
+            "id": "bitcoin",
+            "last_updated": "1495146259",
+            "market_cap_usd": "30729488286.0",
+            "name": "Bitcoin",
+            "percent_change_1h": "-0.13",
+            "percent_change_24h": "3.91",
+            "percent_change_7d": "2.03",
+            "price_btc": "1.0",
+            "price_usd": "1880.88",
+            "rank": "1",
+            "symbol": "BTC",
+            "total_supply": "16337825.0"
+        },
+        {
+            "24h_volume_usd": "1147580.0",
+            "available_supply": "2618846.0",
+            "id": "counterparty",
+            "last_updated": "1495146246",
+            "market_cap_usd": "22417875.0",
+            "name": "Counterparty",
+            "percent_change_1h": "-3.09",
+            "percent_change_24h": "11.25",
+            "percent_change_7d": "8.73",
+            "price_btc": "0.00455539",
+            "price_usd": "8.56021",
+            "rank": "49",
+            "symbol": "XCP",
+            "total_supply": "2618846.0"
+        }
+    ],
+    "fee_info": {
+        "low_priority": 218920,
+        "min_relay_fee": 41210,
+        "optimal": 321491
+    },
+    "network_info": {
+        "mainnet": {
+            "block_height": 467026,
+            "tx_index": 922820,
+            "unconfirmed": {
+                "btc": 202845,
+                "xcp": 132
+            }
+        },
+        "testnet": {
+            "block_height": 1124612,
+            "tx_index": 12869,
+            "unconfirmed": {
+                "btc": 19,
+                "xcp": 0
+            }
+        }
+    }
+}
+ Orders
+Method	Endpoint	Returns
+GET	/api/orders/{address}	Returns list of 'Order' transactions
+GET	/api/orders/{asset}	Returns list of 'Order' transactions
+GET	/api/orders/{block}	Returns list of 'Order' transactions
+Return Values
+Value	Type	Description
+data	Array	Order data
+ block_index	Integer	Block number containing the transaction
+ expiration	Integer	Number of blocks that order is valid for
+ expire_index	Integer	Block number that the order will expire
+ fee_provided	String	The miners' fee provided; in BTC; required only if selling BTC
+ fee_provided_remaining	String	The remaining miners' fee provided; in BTC; required only if selling BTC
+ fee_required	String	The miners' fee required to be paid by orders for them to match this one; in BTC
+ fee_required_remaining	String	The remaining miners' fee required to be paid by orders for them to match this one; in BTC;
+ get_asset	String	Asset name (Ex: PIZZA)
+ get_asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ get_quantity	String	Quantity user would like to buy
+ get_remaining	String	Quantity remaining to buy
+ give_asset	String	Asset name (Ex: PIZZA)
+ give_asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ give_quantity	String	Quantity user would like to sell
+ give_remaining	String	Quantity remaining to sell
+ source	String	The address that made the issuance
+ status	String	Status of the transaction
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+total	Integer	Total number of issuances
+Example Response
+{
+    "data": [{
+            "block_index": 466696,
+            "expiration": 1000,
+            "expire_index": 467696,
+            "fee_provided": "0.00074327",
+            "fee_provided_remaining": "0.00074327",
+            "fee_required": "0.00000000",
+            "fee_required_remaining": "0.00000000",
+            "get_asset": "PEPECASH",
+            "get_asset_longname": "",
+            "get_quantity": "2633775.86947619",
+            "get_remaining": "2633775.86947619",
+            "give_asset": "XCP",
+            "give_asset_longname": "",
+            "give_quantity": "2212.37173036",
+            "give_remaining": "2212.37173036",
+            "source": "1PJ2Za8JbpzDHTpo4CBVDHDgHqKht7FLwg",
+            "status": "open",
+            "timestamp": 1492254524,
+            "tx_hash": "0dd04a905f75e3b677be10a464803900319559da7133a79f0f2bbb4fe6c1413e",
+            "tx_index": 922802
+        },
+        {
+            "block_index": 466675,
+            "expiration": 4320,
+            "expire_index": 470995,
+            "fee_provided": "0.00045352",
+            "fee_provided_remaining": "0.00045352",
+            "fee_required": "0.00020000",
+            "fee_required_remaining": "0.00020000",
+            "get_asset": "PEPECASH",
+            "get_asset_longname": "",
+            "get_quantity": "3000.00000000",
+            "get_remaining": "0.00000000",
+            "give_asset": "PEPEPAWNSHOP",
+            "give_asset_longname": "",
+            "give_quantity": "3",
+            "give_remaining": "0",
+            "source": "1GNQdAkP1zEToHbtZjqaQwqMU6Eg6Xu4Um",
+            "status": "filled",
+            "timestamp": 1492254524,
+            "tx_hash": "a9b604bdc1181bb28a8c52a2bb3ae9622b29721d01a648cdf76240d269151372",
+            "tx_index": 922477
+        },
+        ...
+    ],
+    "total": 14677
+}
+ Order Matches
+Method	Endpoint	Returns
+GET	/api/order_matches/{address}	Returns list of 'Order Match' transactions
+GET	/api/order_matches/{asset}	Returns list of 'Order Match' transactions
+GET	/api/order_matches/{block}	Returns list of 'Order Match' transactions
+Return Values
+Value	Type	Description
+data	Array	Order Match data
+ block_index	Integer	Block number containing the transaction
+ expire_index	Integer	Block number that the order match will expire
+ forward_asset	String	Asset name (Ex: PIZZA)
+ forward_quantity	String	Quantity
+ backward_asset	String	Asset name (Ex: PIZZA)
+ backward_quantity	String	Quantity
+ status	String	Status of the transaction (pending, completed, expired)
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx0_address	String	The source address of the first order transaction
+ tx0_hash	String	The transaction hash of the first order transaction
+ tx1_address	String	The source address of the second order transaction
+ tx1_hash	String	The transaction hash of the second order transaction
+total	Integer	Total number of issuances
+Example Response
+
+  "data": [
+    {
+      "backward_asset": "XCP",
+      "backward_quantity": "9.09592000",
+      "block_index": 500062,
+      "expire_index": 500082,
+      "forward_asset": "VACUS",
+      "forward_quantity": "2680",
+      "status": "completed",
+      "timestamp": 1513649725,
+      "tx0_address": "1PGktcaAM7DwxKd2yadcd52Cj1p6ZnErxi",
+      "tx0_hash": "43753d34ab4acf33da1aa520d919fcef342b4465d59d89eb4764d94f6706a40b",
+      "tx1_address": "1JsYuj7bwuox8rdUpspAgrnMTY7qgF6BnQ",
+      "tx1_hash": "6f1f17231e2ec9283a821fb133b3dc7a2cb9f44cddb072e0e1471214775c265b"
+    }
+  ],
+  "total": 1
+}
+ Sends
+Method	Endpoint	Returns
+GET	/api/sends/{address}	Returns list of 'Send' transactions
+GET	/api/sends/{asset}	Returns list of 'Send' transactions
+GET	/api/sends/{block}	Returns list of 'Send' transactions
+Return Values
+Value	Type	Description
+data	Array	Send data
+ asset	String	Asset name (Ex: PIZZA)
+ asset_longname	String	The subasset longname, if any (Ex: PIZZA.DOMINOS)
+ block_index	Integer	Block number containing the transaction
+ destination	String	The receiving address
+ memo	String	Optional hex encoded memo message
+ quantity	String	Quantity of asset sent
+ source	String	The sending address
+ status	String	Status of the transaction
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+total	Integer	Total number of sends
+Example Response
+{
+    "data": [{
+            "asset": "PEPECASH",
+            "asset_longname": "",
+            "block_index": 466690,
+            "destination": "1PNkBxnz5ePW8FeK6CSs8V2fGHcN9B6HNk",
+            "quantity": "44000.00000000",
+            "source": "1PNkBxnz5ePW8FeK6CSs8V2fGHcN9B6HNk",
+            "status": "valid",
+            "timestamp": 1492254524,
+            "tx_hash": "6461c15fa83c1252f806885ebbbb8bed914b1621c4f5b27039d419b80fd81287",
+            "tx_index": 922735
+        },
+        {
+            "asset": "PEPECASH",
+            "asset_longname": "",
+            "block_index": 466685,
+            "destination": "1PNkBxnz5ePW8FeK6CSs8V2fGHcN9B6HNk",
+            "quantity": "10000.00000000",
+            "source": "1PNkBxnz5ePW8FeK6CSs8V2fGHcN9B6HNk",
+            "status": "valid",
+            "timestamp": 1492254524,
+            "tx_hash": "a34b4584f5cf020163c16e5849ecddedadd19aca9b847d7bf209bd71cf1091cd",
+            "tx_index": 922641
+        },
+        ...
+    ],
+    "total": 7809
+}
+ Send Transaction
+This endpoint takes a signed transaction in hex format and broadcasts it to the network. This is a POST method!
+
+Method	Endpoint	Returns
+POST	/api/send_tx	Returns Transaction hash in hex
+Parameters
+Parameter	Type	Description
+tx_hex	String	A serialized transaction to broadcast
+Return Values
+Value	Type	Description
+ tx_hash	String	Transaction Hash
+Example Response
+{
+    "tx_hash": "fd7be896baf9af3deb5c0f605b5352815fc2d3f7c9f4142d1cc192ea9ae60079"
+}
+ Sweeps
+Method	Endpoint	Returns
+GET	/api/sweeps/{address}	Returns list of 'Sweep' transactions
+GET	/api/sweeps/{block}	Returns list of 'Sweep' transactions
+Return Values
+Value	Type	Description
+data	Array	Sweep data
+ block_index	Integer	Block number containing the transaction
+ destination	String	The receiving address
+ fee_paid	String	The fee paid
+ flags	Integer	The type of sweep
+ memo	String	Optional hex encoded memo message
+ source	String	The sending address
+ status	String	Status of the transaction
+ timestamp	Integer	A UNIX timestamp of when the transaction was processed by the network
+ tx_hash	String	Transaction Hash
+ tx_index	Integer	Transaction Index
+total	Integer	Total number of sweeps
+Example Response
+
+  "data": [
+    {
+      "block_index": 1665466,
+      "destination": "mvThcDEbeqog2aJ7JNj1FefUPaNdYYGqHt",
+      "fee": "0.50000000",
+      "flags": 1,
+      "memo": "testing sweeps balance only",
+      "source": "mrqJbNVwwtRH82mp2DQehX4v8y9UXVFnYA",
+      "status": "valid",
+      "timestamp": 1581307569,
+      "tx_hash": "aa9e1a2191b48f380d017ba3c54aaf346440fb3e7dcc0006466572d923e5112e",
+      "tx_index": 24608
+    },
+    {
+      "block_index": 1665465,
+      "destination": "mvThcDEbeqog2aJ7JNj1FefUPaNdYYGqHt",
+      "fee": "0.50000000",
+      "flags": 3,
+      "memo": "testing sweeps text memo",
+      "source": "mtMv8dBFvPA7WRBWvGLsTNVWhwamwNFK4f",
+      "status": "valid",
+      "timestamp": 1581306362,
+      "tx_hash": "4475ca1d40b9a2806d2c59bc49c2e4aa394a8e8a98b714e139573cd2eed47c75",
+      "tx_index": 24607
+    }
+  ],
+  "total": 2
+}
+ Transaction
+Method	Endpoint	Returns
+GET	/api/transaction/{transaction}	Returns transaction information
+Example Responses
+ Bet
+{
+    "bet_type": "3",
+    "block_index": 461985,
+    "counterwager_quantity": "3.84615384",
+    "counterwager_remaining": "3.84615384",
+    "deadline": "1492182000",
+    "expiration": 417,
+    "expire_index": 462402,
+    "fee": "0.03000000",
+    "feed_address": "1BetXQ5w9mMmJosZ21jUtrebdpgMhYQUaZ",
+    "leverage": "5040",
+    "source": "1A9kQfFmz5UvVmhqSZgRcsfFT1HVE2MYNX",
+    "status": "expired",
+    "target_value": "7",
+    "timestamp": 1492254524,
+    "tx_hash": "a1d575ddd862f6b26a0730caa78fc8892ea21d56e10dd265a3f57970501a8929",
+    "tx_index": 883694,
+    "tx_type": "Bet",
+    "wager_quantity": "50.00000000",
+    "wager_remaining": "50.00000000"
+}
+ Broadcast
+{
+    "block_index": 464547,
+    "fee": "0.00000000",
+    "locked": false,
+    "source": "1FDARDRQRQy1HrRe3nArLXx6FmTxGsd4pY",
+    "status": "valid",
+    "text": "XCPELECTION2017 2",
+    "timestamp": "1493752680",
+    "tx_hash": "781dd36c9ee816226e50d7d9bee9ada95974eab0adf6b264128b80dcae3d8c33",
+    "tx_index": 905532,
+    "tx_type": "Broadcast",
+    "value": "8549"
+}
+ Burn
+{
+    "block_index": 283810,
+    "burned": "0.10000000",
+    "earned": "100.00000000",
+    "locked": false,
+    "source": "1HVgrYx3U258KwvBEvuG7R8ss1RN2Z9J1W",
+    "status": "valid",
+    "timestamp": 1391371108,
+    "tx_hash": "4560d0e3d04927108b615ab106040489aca9c4aceedcf69d2b71f63b3139c7ae",
+    "tx_index": 3070,
+    "tx_type": "Burn"
+}
+ Cancel
+{
+    "block_index": 284239,
+    "offer_hash": "a5f1a0c51acfd695c6dd7c36926321d2548130c8c6aac15fb65fd5050d5a9446",
+    "source": "17PgVzRSSSjc2aN8Lyp1x9QayKzPzY2pKj",
+    "status": "valid",
+    "timestamp": 1391576338,
+    "tx_hash": "ee93e11ebaa7cf288111ac3abec1eb560778c97a611c28fd631c7f7c5d47af58",
+    "tx_index": 3245,
+    "tx_type": "Cancel"
+}
+ Dividend
+{
+    "asset": "ECOBITMAN",
+    "asset_longname": "",
+    "block_index": 466695,
+    "dividend_asset": "PEPECASH",
+    "dividend_asset_longname": "",
+    "fee": "0.00580000",
+    "quantity_per_unit": "100.00000000",
+    "source": "13L4Jd92Mb8YwPCreEkjV422aWaZDVdkrQ",
+    "status": "valid",
+    "total_distributed": "9900.00000000",
+    "timestamp": 1494950716,
+    "tx_hash": "7b841350df7acad53a2e61b654cc0d965aca2aa67f9bafe5eb3bf0f81764447c",
+    "tx_index": 922801,
+    "tx_type": "Dividend"
+}
+ Issuance
+{
+    "asset": "PEPECASH",
+    "asset_longname": "",
+    "block_index": 430263,
+    "description": "",
+    "divisible": true,
+    "fee": "0.50000000",
+    "issuer": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+    "locked": false,
+    "quantity": "1000000000.00000000",
+    "source": "1GQhaWqejcGJ4GhQar7SjcCfadxvf5DNBD",
+    "status": "valid",
+    "transfer": false,
+    "timestamp": 1474131960,
+    "tx_hash": "4a8cd9eeb98000ff763f7334429b4453d627a7064d073f0ee5b4d0475015b1d8",
+    "tx_index": 573564,
+    "tx_type": "Issuance"
+}
+ Order
+{
+    "block_index": 466696,
+    "expiration": 1000,
+    "expire_index": 467696,
+    "fee": "0.00000000",
+    "get_asset": "PEPECASH",
+    "get_asset_longname": "",
+    "get_quantity": "2633775.86947619",
+    "get_remaining": "2633775.86947619",
+    "give_asset": "XCP",
+    "give_asset_longname": "",
+    "give_quantity": "2212.37173036",
+    "give_remaining": "2212.37173036",
+    "source": "1PJ2Za8JbpzDHTpo4CBVDHDgHqKht7FLwg",
+    "status": "open",
+    "timestamp": 1494954997,
+    "tx_hash": "0dd04a905f75e3b677be10a464803900319559da7133a79f0f2bbb4fe6c1413e",
+    "tx_index": 922802,
+    "tx_type": "Order"
+}
+ Send
+{
+  "asset": "XCP",
+  "asset_longname": "",
+  "block_index": 1664644,
+  "destination": "mk6QxTWJMfG8Tx8b1JoksuwsaoYXF6xwPa",
+  "memo": "",
+  "quantity": "0.00000001",
+  "sends": [
+    [
+      "mjcq6cdsXS1sPnqYY7isCcgtfZ7t95G4Kw",
+      "TESTMULTI",
+      "",
+      "0.00000002",
+      "",
+      "valid"
+    ],
+    [
+      "mk6QxTWJMfG8Tx8b1JoksuwsaoYXF6xwPa",
+      "TESTMULTI",
+      "",
+      "0.00000004",
+      "",
+      "valid"
+    ],
+    [
+      "mmqm9h3t5fyz2NdK5MZLaYdTiW5JhWypJ5",
+      "TESTMULTI",
+      "",
+      "0.00000007",
+      "",
+      "valid"
+    ],
+    [
+      "mnaR3RXEZ1tyU9twyrkCFJVz57QTdBhXHU",
+      "TESTMULTI",
+      "",
+      "0.00000005",
+      "",
+      "valid"
+    ],
+    [
+      "mqBqduSw82d4LwugzsATmmMJ7Exf7dLUr1",
+      "TESTMULTI",
+      "",
+      "0.00000006",
+      "",
+      "valid"
+    ],
+    [
+      "muj7iGWPESQG4xuFmM9EATAR7m4fATyvjC",
+      "TESTMULTI",
+      "",
+      "0.00000003",
+      "",
+      "valid"
+    ],
+    [
+      "tb1qh8d34249cjacxpfmsrla4cdxwnvanzqt2q2pnx",
+      "TESTMULTI",
+      "",
+      "0.00000009",
+      "",
+      "valid"
+    ],
+    [
+      "tb1qwxsgt065umdp2xnks0hy68aejvx3zfww4g05e9",
+      "TESTMULTI",
+      "",
+      "0.00000008",
+      "",
+      "valid"
+    ],
+    [
+      "mk6QxTWJMfG8Tx8b1JoksuwsaoYXF6xwPa",
+      "XCP",
+      "",
+      "0.00000001",
+      "",
+      "valid"
+    ]
+  ],
+  "source": "n3jGDBz7oxVWTxKgcmZQodyUXg4Zzr9Y4R",
+  "status": "valid",
+  "timestamp": 1580613842,
+  "tx_hash": "93a85f319c45e0f86fd0f05ace33969b6f6ba25a1b5c582895e008cc83d7f3be",
+  "tx_index": 24557,
+  "tx_type": "Send"
+}
+ Sweep
+{
+  "balances": [
+    [
+      "A7355042031627182347",
+      "RUMPSHAKER.IN.YA.FACE",
+      "1.00000000"
+    ],
+    [
+      "BACONTITS",
+      "",
+      "200.00000000"
+    ],
+    [
+      "BDUSSY",
+      "",
+      "1.00000420"
+    ],
+    [
+      "NONDIVISIBLE",
+      "",
+      "1"
+    ],
+    [
+      "RUMPSHAKER",
+      "",
+      "1.00000000"
+    ],
+    [
+      "SARUTOBI",
+      "",
+      "0.00200000"
+    ],
+    [
+      "SWEEPTEST",
+      "",
+      "100000000.00000000"
+    ],
+    [
+      "XCP",
+      "",
+      "689.25555361"
+    ]
+  ],
+  "block_index": 1665465,
+  "destination": "mvThcDEbeqog2aJ7JNj1FefUPaNdYYGqHt",
+  "flags": "3",
+  "issuances": [
+    [
+      "SWEEPTEST",
+      ""
+    ]
+  ],
+  "memo": "testing sweeps text memo",
+  "source": "mtMv8dBFvPA7WRBWvGLsTNVWhwamwNFK4f",
+  "status": "valid",
+  "timestamp": 1581306362,
+  "tx_hash": "4475ca1d40b9a2806d2c59bc49c2e4aa394a8e8a98b714e139573cd2eed47c75",
+  "tx_index": 24607,
+  "tx_type": "Sweep"
+}
+ UTXOs
+Method	Endpoint	Returns
+GET	/api/utxos/{address}	Returns list of Unspent Transaction Outputs (UTXOs)
+Return Values
+Value	Type	Description
+data	Array	Send data
+ amount	Integer	The amount of the UTXO (e.g. 0.12345678)
+ confirmations	String	Number of confirmations since the UTXO was created
+ height	String	The block height of the UTXO
+ txid	Integer	The txid (hash) that the UTXO was included in
+ value	Integer	The value of the UTXO in satoshis (e.g. 12345678)
+ vout	Integer	The vout number in the specified txid for the UTXO
+total	Integer	Total number of UTXOs
+Example Response
+{
+    "data": [
+    {
+        "vout": 1,
+        "txid": "ff0c44856d032b9882c0b2ffa8ff92ce6b17c4b1490b963bbeb9d85d8b3a5fca",
+        "height": 1296921,
+        "amount": 0.54664935,
+        "confirmations": 606120,
+        "value": 54664935
+    },
+    {
+        "vout": 0,
+        "txid": "ca4a618c522fabe89b22dd0dc2f87b0f2520969db8bacd838540536e03cd47e4",
+        "height": 1291736,
+        "amount": 0.325,
+        "confirmations": 611305,
+        "value": 32500000
+    },
+        ...
+    ],
+    "total": 15
+}

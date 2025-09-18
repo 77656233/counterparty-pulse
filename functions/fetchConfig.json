@@ -1,0 +1,1547 @@
+{
+  "projectName": "CounterpartyPulse",
+  "services": {
+    "counterparty": {
+      "baseUrl": "https://api.counterparty.io:4000/v2/",
+      "rateLimit": 1000,
+      "fetchOrder": [
+        "getXCPAssetInformation",
+        "getXCPAssetIssuances",
+        "getXCPAssetHolders"
+      ],
+      "endpoints": {
+        "assetInfo": { "path": "assets/{asset}" },
+        "issuances": { "path": "assets/{asset}/issuances" }
+      }
+    },
+    "classic": {
+      "baseUrl": "https://classic.tokenscan.io/api/",
+      "rateLimit": 1000,
+      "fetchOrder": [
+        "getXCPAssetInformation",
+        "getXCPAssetIssuances",
+        "getXCPAssetHolders"
+      ],
+      "endpoints": {
+        "assetInfo": { "path": "asset/{asset}" },
+        "issuances": { "path": "issuances/{asset}/" }
+      }
+    }
+  },
+  "auth": {
+    "apiKey": "CPULSE-C714B0F3BF4C99509E714766983AB019",
+    "apiKeys": [
+      "CPULSE-C714B0F3BF4C99509E714766983AB019"
+    ]
+  },
+  "projects": {
+    "TEST": [
+      { "name": "TEST", "classic": true, "counterparty": true, "info": "" }
+    ],
+    "Spells of Genesis": [
+      { "name": "FDCARD", "classic": true, "counterparty": true, "info": "" },
+      { "name": "SJCXCARD", "classic": true, "counterparty": true, "info": "" },
+      { "name": "GEMZCARD", "classic": true, "counterparty": true, "info": "" },
+      { "name": "CLEFCARD", "classic": true, "counterparty": true, "info": "" },
+      { "name": "XCPCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "ETHEREUMCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SHAPESHIFTCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SATOSHICARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "RIPPLECARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GENESISCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "SWARMCD", "classic": true, "counterparty": true, "info": "" },
+      { "name": "CNPCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "SHUMAICARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BEARWHALECD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BLOCKSIZECD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ETHXCPCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "LTBCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "XAJIBESAAR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "XAJIJASPAAR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "XAJIBASILAAR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "ZAIFCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "BAZAARCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CARDAUGUR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WHEREBCYCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CARDAIRBITZ",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "XAJIARKETAAR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "GOXCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "XAJIYEREMAAR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "MINERCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BCYDRAGON",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BTCDRAGONCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CARDASTEMA",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "XAJIBOSS", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "TALISMANCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DOGECOINCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "EMERALDCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CARDAMBER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WAGATECARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "RUBYCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "SAPPHIRECARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SGDARKNESS",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BLOCKTRAILCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SARUTOBICARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GOBLINCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SATOSHILITE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SAYOSIATAX",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DARYENCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "LTCDRAGON",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "COINOFLITECD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SHIELDWALLCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "MAIDSAFECD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SHOPKEEPERCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FOOTSOLDIER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BITSHARESCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CYCLOPSCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "KEEPKEYCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "SADICARD", "classic": true, "counterparty": true, "info": "" },
+      { "name": "CCMCARD", "classic": true, "counterparty": true, "info": "" },
+      { "name": "DASHCD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "FLYINGBLAZE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "MAYALCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "XULNOCCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DAOSOGCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GNOMECARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WATERSCOURT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "EDSCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "VANBEXCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "TROLLSCLUBCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "KRAKENCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WEASELSCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "NEMCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "SORCERESSCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FWCFCFIERYCC",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FWCFCUMRATTC",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FWSDLICEDRAC",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FWSDLFIETHSC",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FWSDLTHEMONC",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "TREZORCD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "HARPIESCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SLACKCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WAVESCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "PEACOCKCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BITCOINCOMCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "BARDCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "BITCOINISTCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SCARECROWCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GOLEMCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WATERSCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "HUNTERCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "MAMAGRUN", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "KAYLAGRUN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GASTADGRUN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "TINYGRUN", "classic": true, "counterparty": true, "info": "" },
+      { "name": "TROYGRUN", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "EMERALDETHER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BITCOINMAGCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GENOFLIGHT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VICTORIACARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "PIXIECARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WAARTHCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "CROWCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "KINGREINDEER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "LAMUSECARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "COINPORTALCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "TATIANACARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "KARMACARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BTCCFORGECD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ROOSTERYEAR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BTCCCOINCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "MARKETACARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "MIGHTYSTORK",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WATERANGEL",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FIREANGEL",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "JEWELDRAGONS",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SAPPHIREELF",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CRAZYLOLA",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WOODMONSTER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "QUIRINCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "HERBODCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "RIDANCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "COINDESKCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CRYSTALIBUR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "FORKCARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "PRINCEOFICE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DARKSTATUE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "MOTHERBIRD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGLAUNCHCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "STAGWARRIOR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GIANTCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SYLVANELF",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "THEMESSENGER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "BADWOLF", "classic": true, "counterparty": true, "info": "" },
+      { "name": "SIACARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "SORCERERAKAM",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "PURPLEDRAGON",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "FACTOMCD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "MUSHROOMSIMP",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BTCMEETUPCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BCINVESTCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ROYALGRIFFIN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "JAYACARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "WEANARAASSAS",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VISCULASCARA",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ROYALDEER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VISCULADRAGO",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ELFMONSTERKI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GRAVIGASSCAR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "TROLLDEPTHS",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "PROSSESSORFL",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CARNIATHCELE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DEVASTATINGM",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "OUTRAGIOUSWA",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VISCULATICK",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SCORPIGAS",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VIGILANTWATE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GRIFFINMASTE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "TRIDENTQUEEN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "DARKAODH", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "HEAVENLYSHEP",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CHARGEELITE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SLASHINGCRIR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "HUNGRYAMPHIB",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "PIRANHAMANIP",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VISCULAMANTI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CRYSTALREFIN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "PRINCEOFWINT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GRIDCOINCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "ELFSAGE", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "VISCULAFROZE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DOGENHANCER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FAIRYTALESHA",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "PRINCESSSUMM",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WIZARDTROLL",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WISETHRAL",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "PRINCEAUTUMN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CENTAURARCHE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "PRINCESSSPRI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WATERELFADMI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "INFECTEDSORM",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WATERSPEARFI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "QUEENSHEALER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VIRBULOSELIT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ICEUNICORN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "PAPIIGAS", "classic": true, "counterparty": true, "info": "" },
+      { "name": "ERAOL", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "YELLOWSHAMAN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "HARBINGERDEA",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DIVINEKNIGHT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VISCULABEETL",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "ICEGOLEM", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "ENCHANTEDSHI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DARKCHALCOSI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CARNIATHCREA",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "OVERARMEDDWA",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "POWERSCATTER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WARRIORLUMIN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FROZENCOLOSS",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "LEVIOTHAN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VISCULAFIREF",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VISCULACENTI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WARRIOROBSCU",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ITLANKINGGAR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "REINFORCEDOC",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DEALERFLAMES",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DEVASTATINGT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "VISCULALADYB",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "QUEENSVIRBUL",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "REINFORCEMEN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GUARDIANSOUR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CORRUPTEDTRO",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "MONSTERDEPTH",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ITLANEXPERTD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CARDMERCHANT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "TRANSCENDEN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DISTRICTOXCD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "TROLLBERSERK",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGHALLOWEEN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DRACOMANCER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SELENACARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "MAYACARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "LYSANDERCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "DIMITRICARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CAMILACARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BALABASTER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "LALABASTER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "EALABASTER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CALABASTER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BADROMANCE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SPRINGSDAWN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "LRIKTHEFIGHT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ETHERMAGE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "ORCSASSAULT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "GUMMYYUMMY",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "POLYMATHCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGWHTDRAGON",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGWEREWOLF",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "SOGJANUS", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "SOGBCYBOX",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "FIERCERABBIT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGWILDHORSE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "LIGHTWARRIOR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "CROWWARRIOR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "THEWATCHER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BEARSPIRIT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGTHEARCHER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGHARELORD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "BROTHERFOX",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WTRSUCCUBUS",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "KINGHURIENK",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "WISEWIZARD",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "MYSTRSMAID",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "DAICARD", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "BULLWHALE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "YODARK", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "SOGVENERIS",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGWINTER",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "SOGMETA", "classic": true, "counterparty": true, "info": "" },
+      { "name": "SOGBEEP", "classic": true, "counterparty": true, "info": "" },
+      { "name": "SOGCOINB", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "SOGTERRALUNA",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGELONMUSK",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGWAKWELI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGHALFINNEY",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGETHMERGE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGSALVADOR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGMUSHEGIAN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGCRYPTOW",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "SOGFTX", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "SOGBITHOTEL",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGSHOCKW",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGMOONCATS",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "SOGCURIO", "classic": true, "counterparty": true, "info": "" },
+      {
+        "name": "SOGCRYPTOSKL",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGHALVING",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGEVERTREE",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGCQUEEN",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGINSCRIPT",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGBULLVBEAR",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGCRYPTOSEC",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      {
+        "name": "SOGBTCMAXI",
+        "classic": true,
+        "counterparty": true,
+        "info": ""
+      },
+      { "name": "SOGXCPMKTPL", "classic": false, "counterparty": true },
+      { "name": "SOGSAYLOR", "classic": false, "counterparty": true },
+      { "name": "SOGNFTMUSEUM", "classic": false, "counterparty": true },
+      { "name": "SOGBCYBACK", "classic": false, "counterparty": true },
+      { "name": "BANKGOBLINCD", "classic": false, "counterparty": true },
+      {
+        "name": "CARDAMP",
+        "classic": true,
+        "counterparty": true,
+        "info": "",
+        "special": "This image was a proposed illustration for the Storj Library Card (SJCXCARD-2015), featuring a more appealing version of the original elderly goblin. Though partners requested a “sexier” redesign, they ultimately chose the original. The card was made in partnership with Storj, a decentralized storage platform using blockchain and peer-to-peer tech for secure, token-powered data storage."
+      },
+      {
+        "name": "A9298018348897857870",
+        "classic": true,
+        "counterparty": true,
+        "info": "",
+        "special": "Early misprint of SYLVANELF. Not part of the official SoG collection. The total supply is 10,000, but the largest holder is a lost wallet."
+      },
+      {
+        "name": "ICEMINOTAUR",
+        "classic": true,
+        "counterparty": true,
+        "info": "",
+        "special": "Early misprint of POLYMATHCARD. Not part of the official SoG collection."
+      },
+      {
+        "name": "MERCHANTCARD",
+        "classic": true,
+        "counterparty": true,
+        "info": "",
+        "special": "Early misprint of CARDMERCHANT. Not part of the official SoG collection."
+      }
+    ]
+  }
+}

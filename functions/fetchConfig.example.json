@@ -1,0 +1,51 @@
+{
+  "projectName": "CounterpartyPulse",
+  "services": {
+    "counterparty": {
+      "baseUrl": "https://api.counterparty.io:4000/v2/",
+      "rateLimit": 1000,
+      "fetchOrder": [
+        "getXCPAssetInformation",
+        "getXCPAssetIssuances",
+        "getXCPAssetHolders"
+      ],
+      "endpoints": {
+        "assetInfo": { "path": "assets/{asset}" },
+        "issuances": { "path": "assets/{asset}/issuances" }
+      }
+    },
+    "classic": {
+      "baseUrl": "https://classic.tokenscan.io/api/",
+      "rateLimit": 1000,
+      "fetchOrder": [
+        "getXCPAssetInformation",
+        "getXCPAssetIssuances",
+        "getXCPAssetHolders"
+      ],
+      "endpoints": {
+        "assetInfo": { "path": "asset/{asset}" },
+        "issuances": { "path": "issuances/{asset}/" }
+      }
+    }
+  },
+  "auth": {
+    "apiKey": "YOUR_API_KEY_HERE",
+    "apiKeys": [
+      "YOUR_API_KEY_HERE"
+    ]
+  },
+  "projects": {
+    "Example Project": [
+      { 
+        "name": "EXAMPLEASSET", 
+        "classic": true, 
+        "counterparty": true, 
+        "info": "Example asset description" 
+      }
+    ],
+    "Spells of Genesis": [
+      { "name": "FDCARD", "classic": true, "counterparty": true, "info": "" },
+      { "name": "SJCXCARD", "classic": true, "counterparty": true, "info": "" }
+    ]
+  }
+}
