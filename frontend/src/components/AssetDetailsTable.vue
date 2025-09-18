@@ -4,19 +4,19 @@
       <tbody>
         <tr>
           <td class="w-28 text-base-content/70">Issuer</td>
-          <td class="font-mono break-all">{{ issuer || '-' }}</td>
+          <td class="font-mono break-all">{{ props.issuer || '-' }}</td>
         </tr>
         <tr>
           <td class="w-28 text-base-content/70">Owner</td>
-          <td class="font-mono break-all">{{ owner || '-' }}</td>
+          <td class="font-mono break-all">{{ props.owner || '-' }}</td>
         </tr>
-        <tr v-if="info">
+        <tr v-if="props.info">
           <td class="w-28 text-base-content/70">Info</td>
-          <td class="break-words whitespace-pre-wrap">{{ info }}</td>
+          <td class="break-words whitespace-pre-wrap">{{ props.info }}</td>
         </tr>
-        <tr v-if="special">
+        <tr v-if="props.special">
           <td class="w-28 text-base-content/70">Special</td>
-          <td class="break-words whitespace-pre-wrap">{{ special }}</td>
+          <td class="break-words whitespace-pre-wrap">{{ props.special }}</td>
         </tr>
       </tbody>
     </table>
@@ -31,7 +31,7 @@ const props = defineProps({
   info: { type: String, default: '' },
   special: { type: String, default: '' },
 });
-const { issuer, owner, info, special } = props;
+// Don't destructure props - use props.issuer directly in template
 </script>
 
 <style scoped>

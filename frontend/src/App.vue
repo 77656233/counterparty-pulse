@@ -12,7 +12,7 @@
         :style="{ width: progressBarWidth }"
       ></div>
     </div>
-    <!-- Centered percent overlay while loading everything for the selected project -->
+    <!-- Centered percentage display while loading everything for the selected project -->
     <div v-if="!initialLoaded" class="fixed inset-0 z-40 flex items-center justify-center">
       <div class="px-4 py-2 rounded bg-base-100/80 text-base-content text-2xl font-semibold">
         {{ hasKnownTotal ? prefetchProgressPercent + '%' : 'Loading…' }}
@@ -28,6 +28,7 @@
       >
         ☰
       </button>
+      
       <div class="w-full flex justify-center">
         <Pagination
           :total-items="totalItemsForPagination"
@@ -50,6 +51,7 @@
           :require-locked="requireLocked"
           :require-special="requireSpecial"
           :has-special="hasSpecialInProject"
+          :is-connected="isConnected"
           @update:selectedProject="val => selectedProject = val"
           @update:sortOrder="val => sortOrder = val"
           @update:searchQuery="val => searchQuery = val"
@@ -76,6 +78,7 @@
               :require-locked="requireLocked"
               :require-special="requireSpecial"
               :has-special="hasSpecialInProject"
+              :is-connected="isConnected"
               @update:selectedProject="val => selectedProject = val"
               @update:sortOrder="val => sortOrder = val"
               @update:searchQuery="val => searchQuery = val"
@@ -101,15 +104,20 @@ import Card from "./components/Card.vue";
 import FiltersSidebar from "./components/FiltersSidebar.vue";
 import Pagination from "./components/Pagination.vue";
 
-import { collection, documentId, getCountFromServer, getDocs, orderBy, limit as qlimit, query, startAfter, where } from "firebase/firestore";
+import { collection, documentId, getCountFromServer, getDocs, onSnapshot, orderBy, limit as qlimit, query, startAfter, where } from "firebase/firestore";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { db } from "./firebase";
 import { getFirstIssuanceTimestamp } from "./utils/issuanceTime.js";
 
 const assets = ref([]); // incrementally loaded docs
+const forceUpdate = ref(0); // Force reactivity trigger
 const loading = ref(false);
 const hasMore = ref(true);
 let _lastDoc = null;
+// Real-time listeners management
+let _activeListeners = [];
+const isConnected = ref(true);
+const realtimeLoadingProgress = ref(0); // For smooth loading animation
 // Text search within the selected project (client-side)
 const searchQuery = ref("");
 // Track whether server-side where(project)==... with orderBy(name) is supported; fall back if index missing
@@ -278,7 +286,9 @@ const sortedAssets = computed(() => {
   return arr;
 });
 
-const visibleAssets = computed(() => sortedAssets.value);
+const visibleAssets = computed(() => {
+  return sortedAssets.value;
+});
 
 // Active client-side filters besides the project itself (sorting doesn't change count)
 const hasActiveClientFilters = computed(() => !!searchQuery.value.trim() || requireDivisible.value || requireLocked.value || requireSpecial.value);
@@ -313,6 +323,11 @@ const pagedAssets = computed(() => {
 const loadedProjectCount = computed(() => assets.value.reduce((acc, a) => acc + (((a.project || 'Spells of Genesis') === selectedProject.value) ? 1 : 0), 0));
 const hasKnownTotal = computed(() => projectTotalCount.value != null && projectTotalCount.value > 0);
 const prefetchProgressPercent = computed(() => {
+  // If we're using realtime loading, use the smooth progress
+  if (!initialLoaded.value && realtimeLoadingProgress.value > 0) {
+    return Math.min(95, Math.floor(realtimeLoadingProgress.value)); // Cap at 95% until fully loaded, use whole numbers
+  }
+  
   const total = projectTotalCount.value || 0;
   if (!total) return 0;
   const loaded = loadedProjectCount.value;
@@ -478,6 +493,130 @@ async function loadAllForProject() {
   }
 }
 
+// Real-time updates function
+function setupRealtimeListeners() {
+  // Clean up existing listeners
+  cleanupListeners();
+  
+  if (!selectedProject.value) {
+    return;
+  }
+  
+  // Reset progress for smooth loading animation
+  realtimeLoadingProgress.value = 0;
+  
+  // Simulate gradual loading progress
+  const progressInterval = setInterval(() => {
+    if (realtimeLoadingProgress.value < 80) {
+      realtimeLoadingProgress.value += Math.random() * 15 + 5; // Random 5-20% jumps
+    }
+  }, 200);
+  
+  try {
+    const colRef = collection(db, 'assets');
+    // Real query for the selected project
+    const realQuery = query(colRef, where('project', '==', selectedProject.value));
+    
+    const unsubscribe = onSnapshot(realQuery, 
+      (snapshot) => {
+        isConnected.value = true;
+        
+        // For fresh data (not from cache), replace all project assets
+        if (!snapshot.metadata.fromCache) {
+          const projectAssets = snapshot.docs.map(doc => {
+            const data = { ...doc.data() };
+            return data;
+          });
+          
+          console.log(`� Loading ${projectAssets.length} assets for ${selectedProject.value}`);
+          
+          // Remove old project assets and add new ones
+          assets.value = assets.value.filter(a => (a.project || 'Spells of Genesis') !== selectedProject.value);
+          assets.value.push(...projectAssets);
+          
+          // Sort by name
+          assets.value.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+          
+          if (!initialLoaded.value) {
+            clearInterval(progressInterval);
+            realtimeLoadingProgress.value = 100;
+            setTimeout(() => {
+              initialLoaded.value = true;
+            }, 300);
+          }
+        }
+        
+        // Handle real-time changes
+        snapshot.docChanges().forEach((change) => {
+          // Skip initial load changes from cache
+          if (snapshot.metadata.fromCache && change.type === 'added') return;
+          
+          const data = { ...change.doc.data() };
+          
+          // Check what field contains the asset identifier
+          const assetId = data.asset || data.name || data.id || change.doc.id;
+          
+          if (!assetId) {
+            console.warn('⚠️ Skipping document without identifier:', data);
+            return;
+          }
+          
+          if (change.type === 'modified' && !snapshot.metadata.fromCache) {
+            // Try to find the asset using different possible identifiers
+            let index = assets.value.findIndex(a => a.name === assetId);
+            
+            if (index !== -1) {
+              // Create completely new array to force Vue reactivity
+              const newAssets = [...assets.value];
+              newAssets[index] = { ...data }; // Create new object reference
+              assets.value = newAssets; // Replace entire array
+              
+              // Force Vue to update in next tick
+              nextTick(() => {
+                // UI updated
+              });
+              
+            } else {
+              console.warn(`⚠️ Could not find asset ${assetId} in assets array`);
+            }
+          }
+        });
+      },
+      (error) => {
+        console.error('🔥 Real listener ERROR:', error);
+        isConnected.value = false;
+        clearInterval(progressInterval);
+        // Fallback to static loading
+        loadAllForProject().then(() => {
+          initialLoaded.value = true;
+        });
+      }
+    );
+    
+    _activeListeners.push(unsubscribe);
+    
+  } catch (error) {
+    console.error('❌ Real listener catch error:', error);
+    isConnected.value = false;
+    clearInterval(progressInterval);
+    // Fallback to static loading
+    loadAllForProject().then(() => {
+      initialLoaded.value = true;
+    });
+  }
+}
+
+function cleanupListeners() {
+  _activeListeners.forEach(unsubscribe => {
+    try {
+      unsubscribe();
+    } catch (e) {
+      console.warn('Error cleaning up listener:', e);
+    }
+  });
+  _activeListeners = [];
+}
+
 onMounted(async () => {
   // Read ?project= from URL if present
   try {
@@ -502,11 +641,17 @@ onMounted(async () => {
       if (!Number.isNaN(n) && n > 0) currentPage.value = n;
     }
   } catch {}
-  // Load server count (for accurate %), then load all items upfront for the selected project
+  // Load server count (for accurate %), then setup real-time listeners (no static load needed)
   initialLoaded.value = false;
   await loadProjectCount();
-  await loadAllForProject();
-  initialLoaded.value = true;
+  
+  // 🔥 NEW: Use ONLY real-time listeners (no static load)
+  setupRealtimeListeners();
+});
+
+// Cleanup listeners on unmount
+onUnmounted(() => {
+  cleanupListeners();
 });
 
 // Keep localStorage in sync when page changes via clamp
@@ -519,6 +664,10 @@ watch(selectedProject, async () => {
   currentPage.value = 1;
   serverFilterSupported.value = true;
   initialLoaded.value = false;
+  
+  // 🔥 Clean up previous listeners before switching projects
+  cleanupListeners();
+  
   // Update URL param ?project=
   try {
     const url = new URL(window.location.href);
@@ -529,8 +678,9 @@ watch(selectedProject, async () => {
   // Refresh project counts (non-blocking) so dropdown shows accurate numbers
   loadAllProjectCounts().catch(() => {});
   await loadProjectCount();
-  await loadAllForProject();
-  initialLoaded.value = true;
+  
+  // 🔥 NEW: Use ONLY real-time listeners for new project (no static load)
+  setupRealtimeListeners();
 });
 
 // Search only affects client-side filtering (everything is loaded)

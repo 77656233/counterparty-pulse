@@ -21,16 +21,23 @@ import { computed } from 'vue';
 import { formatAssetQuantity } from '../utils/addressBurns.js';
 
 const props = defineProps({
-  issuancesCount: Number, // from stats.issuancesCount
-  burns: Number,
-  addressBurns: Number,
-  supply: Number,
-  availableSupply: Number,
+  issuancesCount: [Number, String], // from stats.issuancesCount (can be string from Firestore)
+  burns: [Number, String],
+  addressBurns: [Number, String], 
+  supply: [Number, String],
+  availableSupply: [Number, String],
   divisible: Boolean
 });
 
+// Convert string props to numbers for calculations
+const issuancesCountNum = computed(() => Number(props.issuancesCount) || 0);
+const burnsNum = computed(() => Number(props.burns) || 0);
+const addressBurnsNum = computed(() => Number(props.addressBurns) || 0);
+const supplyNum = computed(() => Number(props.supply) || 0);
+const availableSupplyNum = computed(() => Number(props.availableSupply) || 0);
+
 // 100% reference = issuances amount = supply + burns (address burns are NOT part of issuances)
-const issuancesAmount = computed(() => (Number(props.supply)||0) + (Number(props.burns)||0));
+const issuancesAmount = computed(() => supplyNum.value + burnsNum.value);
 const baseAmount = computed(() => issuancesAmount.value > 0 ? issuancesAmount.value : 1);
 
 function widthAmount(v){
@@ -41,19 +48,19 @@ function widthAmount(v){
 
 const formatted = computed(() => ({
   issuances: formatAssetQuantity(issuancesAmount.value, props.divisible),
-  burns: formatAssetQuantity(props.burns, props.divisible),
-  addressBurns: formatAssetQuantity(props.addressBurns, props.divisible),
-  supply: formatAssetQuantity(props.supply, props.divisible),
-  availableSupply: formatAssetQuantity(props.availableSupply, props.divisible)
+  burns: formatAssetQuantity(burnsNum.value, props.divisible),
+  addressBurns: formatAssetQuantity(addressBurnsNum.value, props.divisible),
+  supply: formatAssetQuantity(supplyNum.value, props.divisible),
+  availableSupply: formatAssetQuantity(availableSupplyNum.value, props.divisible)
 }));
 
 const rows = computed(() => [
   // Order: Issuances, Burns, Supply, Address Burns, Available Supply
   { key: 'issuances', label: 'Issuances', display: formatted.value.issuances, width: issuancesAmount.value > 0 ? 100 : 0, bg: 'bg-gray-400' },
-  { key: 'burns', label: 'Burns', display: formatted.value.burns, width: widthAmount(props.burns), bg: 'bg-red-500' },
-  { key: 'supply', label: 'Supply', display: formatted.value.supply, width: widthAmount(props.supply), bg: 'bg-gray-400' },
-  { key: 'addressBurns', label: 'Address Burns', display: formatted.value.addressBurns, width: widthAmount(props.addressBurns), bg: 'bg-red-500' },
-  { key: 'availableSupply', label: 'Available Supply', display: formatted.value.availableSupply, width: widthAmount(props.availableSupply), bg: 'bg-green-500' }
+  { key: 'burns', label: 'Burns', display: formatted.value.burns, width: widthAmount(burnsNum.value), bg: 'bg-red-500' },
+  { key: 'supply', label: 'Supply', display: formatted.value.supply, width: widthAmount(supplyNum.value), bg: 'bg-gray-400' },
+  { key: 'addressBurns', label: 'Address Burns', display: formatted.value.addressBurns, width: widthAmount(addressBurnsNum.value), bg: 'bg-red-500' },
+  { key: 'availableSupply', label: 'Available Supply', display: formatted.value.availableSupply, width: widthAmount(availableSupplyNum.value), bg: 'bg-green-500' }
 ]);
 </script>
 

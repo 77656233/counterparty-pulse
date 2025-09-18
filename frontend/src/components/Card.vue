@@ -134,25 +134,21 @@ const hasClassic = computed(() => !!props.asset?.data?.classic);
 const activeTab = ref(hasCounterparty.value ? 'counterparty' : (hasClassic.value ? 'classic' : 'counterparty'));
 const showModal = ref(false);
 
-const counterpartyRaw = props.asset.data.counterparty || {};
-const classicRaw = props.asset.data.classic || {};
-const counterpartyStatsData = getCounterpartyStats(counterpartyRaw);
-const classicStatsData = getClassicStats(classicRaw);
+const counterpartyRaw = computed(() => props.asset.data.counterparty || {});
+const classicRaw = computed(() => props.asset.data.classic || {});
+const counterpartyStatsData = computed(() => getCounterpartyStats(counterpartyRaw.value));
+const classicStatsData = computed(() => getClassicStats(classicRaw.value));
 
 // Address burns calculation similar to AssetInfo
-const counterpartyAddressBurns = calcAddressBurns(counterpartyRaw.holders || [], { divisible: counterpartyStatsData.divisible });
-const classicAddressBurns = calcAddressBurns(classicRaw.holders?.data || [], { divisible: classicStatsData.divisible });
+const counterpartyAddressBurns = computed(() => calcAddressBurns(counterpartyRaw.value.holders || [], { divisible: counterpartyStatsData.value.divisible }));
+const classicAddressBurns = computed(() => calcAddressBurns(classicRaw.value.holders?.data || [], { divisible: classicStatsData.value.divisible }));
 
 // Supply is already (issued - burns); Available = supply - addressBurns
-const counterpartyAvailableSupply = (Number(counterpartyRaw.supply)||0) - counterpartyAddressBurns;
-const classicAvailableSupply = (Number(classicRaw.supply)||0) - classicAddressBurns;
+const counterpartyAvailableSupply = computed(() => (Number(counterpartyRaw.value.supply)||0) - counterpartyAddressBurns.value);
+const classicAvailableSupply = computed(() => (Number(classicRaw.value.supply)||0) - classicAddressBurns.value);
 
-const issuanceTs = ref(getFirstIssuanceTimestamp(props.asset, activeTab.value));
-const issuanceDates = ref(formatIssuanceDates(issuanceTs.value));
-watch(activeTab, (val) => {
-  issuanceTs.value = getFirstIssuanceTimestamp(props.asset, val);
-  issuanceDates.value = formatIssuanceDates(issuanceTs.value);
-});
+const issuanceTs = computed(() => getFirstIssuanceTimestamp(props.asset, activeTab.value));
+const issuanceDates = computed(() => formatIssuanceDates(issuanceTs.value));
 
 // When available chains change (e.g., after data loading), adjust active tab
 watch([hasCounterparty, hasClassic], () => {
@@ -163,8 +159,8 @@ watch([hasCounterparty, hasClassic], () => {
   }
 });
 
-function counterpartyStats(asset){ return counterpartyStatsData; }
-function classicStats(asset){ return classicStatsData; }
+function counterpartyStats(asset){ return counterpartyStatsData.value; }
+function classicStats(asset){ return classicStatsData.value; }
 </script>
 
 <style scoped>

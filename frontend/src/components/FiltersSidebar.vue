@@ -56,6 +56,25 @@
         <span class="label-text text-sm">Special</span>
       </label>
     </div>
+    
+    <!-- 🔥 NEW: Connection Status at bottom -->
+    <div class="mt-auto pt-4 border-t border-base-200">
+      <div class="flex items-center justify-center space-x-2 py-2">
+        <div 
+          :class="[
+            'w-3 h-3 rounded-full transition-colors duration-300',
+            isConnected ? 'bg-green-400' : 'bg-red-400 animate-pulse'
+          ]"
+          :title="isConnected ? 'Live updates active' : 'Connection lost - using static data'"
+        ></div>
+        <span 
+          class="text-sm font-medium"
+          :class="isConnected ? 'text-green-600' : 'text-red-500'"
+        >
+          {{ isConnected ? 'Real-time Updates' : 'Offline Mode' }}
+        </span>
+      </div>
+    </div>
   </aside>
 </template>
 
@@ -69,6 +88,7 @@ const props = defineProps({
   requireLocked: { type: Boolean, required: true },
   requireSpecial: { type: Boolean, required: true },
   hasSpecial: { type: Boolean, required: false, default: false },
+  isConnected: { type: Boolean, required: false, default: true },
 });
 
 const emit = defineEmits(['update:selectedProject', 'update:sortOrder', 'update:searchQuery', 'update:requireDivisible', 'update:requireLocked', 'update:requireSpecial']);
