@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1f2937;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#111827;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Pulse gradient -->
+    <linearGradient id="pulseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:rgb(236, 21, 80);stop-opacity:0.3" />
+      <stop offset="50%" style="stop-color:rgb(236, 21, 80);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgb(236, 21, 80);stop-opacity:0.3" />
+    </linearGradient>
+    
+    <!-- Text gradient -->
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+  
+  <!-- Background pulse lines - much more subtle -->
+  <path d="M0 315 L100 315 L120 280 L140 350 L160 300 L180 330 L200 290 L220 340 L240 315 L1200 315" 
+        fill="none" 
+        stroke="url(#pulseGrad)" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        opacity="0.15"/>
+  
+  <path d="M0 250 L80 250 L100 230 L120 270 L140 240 L160 260 L180 235 L200 265 L220 250 L1200 250" 
+        fill="none" 
+        stroke="url(#pulseGrad)" 
+        stroke-width="1.5" 
+        stroke-linecap="round" 
+        opacity="0.1"/>
+  
+  <path d="M0 380 L90 380 L110 360 L130 400 L150 370 L170 390 L190 365 L210 395 L230 380 L1200 380" 
+        fill="none" 
+        stroke="url(#pulseGrad)" 
+        stroke-width="1.5" 
+        stroke-linecap="round" 
+        opacity="0.1"/>
+  
+  <!-- Main pulse line in center - much more subtle -->
+  <path d="M200 315 L250 315 L280 280 L310 350 L340 300 L370 330 L400 290 L430 340 L460 315 L500 280 L530 350 L560 300 L590 330 L620 290 L650 340 L680 315 L1000 315" 
+        fill="none" 
+        stroke="rgb(236, 21, 80)" 
+        stroke-width="2" 
+        stroke-linecap="round"
+        opacity="0.4"/>
+  
+  <!-- Fewer, more subtle pulse dots -->
+  <circle cx="280" cy="280" r="3" fill="rgb(236, 21, 80)" opacity="0.6">
+    <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="590" cy="330" r="3" fill="rgb(236, 21, 80)" opacity="0.6">
+    <animate attributeName="opacity" values="0.6;0.3;0.6" dur="4s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Main title -->
+  <text x="600" y="220" 
+        font-family="Arial, sans-serif" 
+        font-size="84" 
+        font-weight="bold" 
+        text-anchor="middle" 
+        fill="url(#textGrad)">
+    CounterpartyPulse
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="290" 
+        font-family="Arial, sans-serif" 
+        font-size="36" 
+        text-anchor="middle" 
+        fill="#d1d5db">
+    Real-time Counterparty Asset Tracker
+  </text>
+  
+  <!-- URL -->
+  <text x="600" y="420" 
+        font-family="Arial, sans-serif" 
+        font-size="32" 
+        text-anchor="middle" 
+        fill="rgb(236, 21, 80)" 
+        font-weight="600">
+    counterpartypulse.web.app
+  </text>
+  
+</svg>
