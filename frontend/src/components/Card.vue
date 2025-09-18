@@ -7,8 +7,9 @@
           <span class="block shadow text-1xl font-bold text-white tracking-wide px-6 pt-3 pb-1">
             {{ asset.name }}
           </span>
-          <span v-if="issuanceDates.local" class="block text-xs text-white/80 font-normal pb-3" style="font-size: 0.7rem;">
-            {{ issuanceDates.local }} ({{ issuanceDates.utc }})
+          <span v-if="issuanceDates.local" class="block text-xs text-white/80 font-normal pb-3 text-center px-2" style="font-size: 0.7rem; line-height: 1.2;">
+            <span class="block sm:inline">{{ issuanceDates.local }}</span>
+            <span class="block sm:inline sm:ml-1">({{ issuanceDates.utc }})</span>
           </span>
         </div>
   <AssetImage :name="asset.name" :alt="asset.name" @click="showModal = true" />
