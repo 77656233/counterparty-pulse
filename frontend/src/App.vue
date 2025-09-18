@@ -12,7 +12,6 @@
         :style="{ width: progressBarWidth }"
       ></div>
     </div>
-    <!-- Centered percentage display while loading everything for the selected project -->
     <div v-if="!initialLoaded" class="fixed inset-0 z-40 flex items-center justify-center">
       <div class="px-4 py-2 rounded bg-base-100/80 text-base-content text-2xl font-semibold">
         {{ hasKnownTotal ? prefetchProgressPercent + '%' : 'Loading…' }}
@@ -502,6 +501,9 @@ function setupRealtimeListeners() {
     return;
   }
   
+  // Track recent updates to avoid duplicate processing
+  const recentUpdates = new Map(); // assetId -> timestamp
+  
   // Reset progress for smooth loading animation
   realtimeLoadingProgress.value = 0;
   
@@ -521,8 +523,11 @@ function setupRealtimeListeners() {
       (snapshot) => {
         isConnected.value = true;
         
-        // For fresh data (not from cache), replace all project assets
-        if (!snapshot.metadata.fromCache) {
+        // ONLY do full reload for initial load (when we have no assets for this project yet)
+        const currentProjectAssets = assets.value.filter(a => (a.project || 'Spells of Genesis') === selectedProject.value);
+        const isInitialLoad = !initialLoaded.value && currentProjectAssets.length === 0;
+        
+        if (!snapshot.metadata.fromCache && isInitialLoad) {
           const projectAssets = snapshot.docs.map(doc => {
             const data = { ...doc.data() };
             return data;
@@ -537,18 +542,16 @@ function setupRealtimeListeners() {
           // Sort by name
           assets.value.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
           
-          if (!initialLoaded.value) {
-            clearInterval(progressInterval);
-            realtimeLoadingProgress.value = 100;
-            setTimeout(() => {
-              initialLoaded.value = true;
-            }, 300);
-          }
+          clearInterval(progressInterval);
+          realtimeLoadingProgress.value = 100;
+          setTimeout(() => {
+            initialLoaded.value = true;
+          }, 300);
         }
         
-        // Handle real-time changes
+        // Handle incremental real-time changes (both initial and later)
         snapshot.docChanges().forEach((change) => {
-          // Skip initial load changes from cache
+          // Skip initial load changes from cache (these are just local cache hits)
           if (snapshot.metadata.fromCache && change.type === 'added') return;
           
           const data = { ...change.doc.data() };
@@ -561,9 +564,45 @@ function setupRealtimeListeners() {
             return;
           }
           
-          if (change.type === 'modified' && !snapshot.metadata.fromCache) {
-            // Try to find the asset using different possible identifiers
-            let index = assets.value.findIndex(a => a.name === assetId);
+          // Simple logging to see what changed (just field names, not values)
+          const changedFields = [];
+          if (change.type === 'modified') {
+            const oldAsset = assets.value.find(a => a.name === assetId);
+            if (oldAsset) {
+              // Check what top-level fields changed
+              const fields = ['supply', 'holders', 'divisible', 'locked', 'issuances'];
+              fields.forEach(field => {
+                const oldVal = oldAsset.data?.counterparty?.[field] || oldAsset.data?.classic?.[field];
+                const newVal = data.data?.counterparty?.[field] || data.data?.classic?.[field];
+                if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+                  changedFields.push(field);
+                }
+              });
+            }
+          }
+          
+          // Skip duplicate updates within 2 seconds
+          const now = Date.now();
+          const lastUpdate = recentUpdates.get(assetId);
+          if (lastUpdate && (now - lastUpdate) < 2000) {
+            console.log(`⏭️ Skipping duplicate update for ${assetId} (${now - lastUpdate}ms ago)`);
+            return;
+          }
+          recentUpdates.set(assetId, now);
+          
+          console.log(`🔄 Real-time change: ${change.type} for asset ${assetId}${changedFields.length ? ' | Updated: ' + changedFields.join(', ') : ''}`);
+          
+          if (change.type === 'added' && !isInitialLoad) {
+            // New asset added (only if not during initial load)
+            const existingIndex = assets.value.findIndex(a => a.name === assetId);
+            if (existingIndex === -1) {
+              assets.value.push(data);
+              // Resort the array
+              assets.value.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            }
+          } else if (change.type === 'modified') {
+            // Asset updated
+            const index = assets.value.findIndex(a => a.name === assetId);
             
             if (index !== -1) {
               // Create completely new array to force Vue reactivity
@@ -571,13 +610,18 @@ function setupRealtimeListeners() {
               newAssets[index] = { ...data }; // Create new object reference
               assets.value = newAssets; // Replace entire array
               
-              // Force Vue to update in next tick
-              nextTick(() => {
-                // UI updated
-              });
-              
+              console.log(`✅ Updated asset ${assetId} at index ${index}`);
             } else {
-              console.warn(`⚠️ Could not find asset ${assetId} in assets array`);
+              console.warn(`⚠️ Could not find asset ${assetId} in assets array for update`);
+            }
+          } else if (change.type === 'removed') {
+            // Asset deleted
+            const index = assets.value.findIndex(a => a.name === assetId);
+            if (index !== -1) {
+              const newAssets = [...assets.value];
+              newAssets.splice(index, 1);
+              assets.value = newAssets;
+              console.log(`🗑️ Removed asset ${assetId}`);
             }
           }
         });
@@ -690,7 +734,4 @@ watch(searchQuery, () => { currentPage.value = 1; });
 watch([requireDivisible, requireLocked, requireSpecial], () => { currentPage.value = 1; });
 watch(sortOrder, () => { currentPage.value = 1; });
 
-// No server interaction needed on page/pageSize changes after full load
-
-// No background prefetch (we load everything upfront per project)
 </script>

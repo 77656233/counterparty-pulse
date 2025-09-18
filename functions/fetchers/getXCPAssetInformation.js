@@ -19,16 +19,10 @@ module.exports = async function(asset, config, project, serviceName, log) {
   );
   await docRef.set({
     ...assetInfo,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    [svcUpdatedField]: admin.firestore.FieldValue.serverTimestamp(),
-  }, {merge: true});
-  await docRef.update({
     ["data." + serviceName]: info,
+    offers: {opensea: [], counterparty: [], classic: []},
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     [svcUpdatedField]: admin.firestore.FieldValue.serverTimestamp(),
-  });
-  await docRef.set({
-    offers: {opensea: [], counterparty: [], classic: []},
   }, {merge: true});
   const meta = {service: serviceName, project, asset: asset.name};
   if (log && log.info) log.info("assetInfo:written", meta);
