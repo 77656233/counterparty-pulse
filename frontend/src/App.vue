@@ -123,8 +123,6 @@ const searchQuery = ref("");
 const serverFilterSupported = ref(true);
 // Fast total count for selected project (server-side aggregate)
 const projectTotalCount = ref(null);
-// Server-aggregate counts per project (fast count endpoint)
-const projectCounts = ref({});
 // Initial, full load finished for current project
 const initialLoaded = ref(false);
 // Responsive page size: mobile 15, tablet 20, desktop 18
@@ -149,27 +147,80 @@ const requireLocked = ref(false); // toggle: only show locked when true
 const requireSpecial = ref(false); // toggle: only show items with special text when true
 const sidebarOpen = ref(false);
 
-// Project list with counts (fallback to 'Spells of Genesis' if missing)
-const KNOWN_PROJECTS = ['Spells of Genesis', 'TEST'];
-const projects = computed(() => {
-  // Collect candidate names from known list, selected, and loaded assets
-  const names = new Set(KNOWN_PROJECTS);
-  names.add(selectedProject.value);
-  for (const a of assets.value) names.add(a.project || 'Spells of Genesis');
-  // Build array with counts: prefer server aggregate from projectCounts, fallback to local loaded count
-  const arr = Array.from(names).map((name) => {
-    const serverCount = projectCounts.value?.[name];
-    if (typeof serverCount === 'number') return { name, count: serverCount };
-    const localCount = assets.value.reduce((acc, a) => acc + (((a.project || 'Spells of Genesis') === name) ? 1 : 0), 0);
-    return { name, count: localCount };
-  });
-  // Ensure selected project's count is exact if projectTotalCount is available
-  const idx = arr.findIndex(p => p.name === selectedProject.value);
-  if (idx !== -1 && projectTotalCount.value != null) {
-    arr[idx] = { ...arr[idx], count: projectTotalCount.value };
+// Project configuration (load from Firebase config collection)
+const availableProjects = ref([]);
+const configLoaded = ref(false);
+const projectCounts = ref({}); // Asset counts for all projects
+
+// Load project configuration from Firebase
+async function loadProjectConfig() {
+  try {
+    console.log('🔄 Loading project config from Firebase...');
+    const configDoc = await getDocs(query(collection(db, 'config')));
+    
+    if (configDoc.docs.length > 0) {
+      const config = configDoc.docs[0].data();
+      if (config.projects) {
+        availableProjects.value = Object.keys(config.projects);
+        console.log(`📋 Loaded projects from config:`, availableProjects.value);
+      }
+    } else {
+      console.warn('⚠️ No config document found, falling back to asset scan');
+      // Fallback: scan unique projects from assets collection
+      const assetsSnapshot = await getDocs(collection(db, 'assets'));
+      const projectNames = new Set();
+      assetsSnapshot.docs.forEach(doc => {
+        const project = doc.data().project || 'Spells of Genesis';
+        projectNames.add(project);
+      });
+      availableProjects.value = Array.from(projectNames);
+      console.log(`📋 Scanned projects from assets:`, availableProjects.value);
+    }
+    
+    configLoaded.value = true;
+  } catch (e) {
+    console.error('❌ Failed to load project config:', e);
+    // Ultimate fallback
+    availableProjects.value = ['Spells of Genesis'];
+    configLoaded.value = true;
   }
-  return arr;
+}
+
+// Project list with counts (from config + server counts for ALL projects)
+const projects = computed(() => {
+  if (!configLoaded.value) return [];
+  
+  return availableProjects.value.map(projectName => {
+    // Use server count if available, otherwise 0 (will be loaded async)
+    const count = projectCounts.value[projectName] || 0;
+    return { name: projectName, count };
+  });
 });
+
+// Load asset counts for ALL projects (for dropdown numbers)
+async function loadAllProjectCounts() {
+  try {
+    console.log('🔄 Loading asset counts for all projects...');
+    const counts = {};
+    
+    for (const projectName of availableProjects.value) {
+      try {
+        const q = query(collection(db, 'assets'), where('project', '==', projectName));
+        const snapshot = await getCountFromServer(q);
+        counts[projectName] = snapshot.data().count || 0;
+        console.log(`📊 ${projectName}: ${counts[projectName]} assets`);
+      } catch (e) {
+        console.warn(`⚠️ Failed to count assets for ${projectName}:`, e);
+        counts[projectName] = 0;
+      }
+    }
+    
+    projectCounts.value = counts;
+    console.log('✅ All project counts loaded:', counts);
+  } catch (e) {
+    console.error('❌ Failed to load project counts:', e);
+  }
+}
 const totalAssetCount = computed(() => assets.value.length);
 
 function aggFirstIssuanceTs(a) {
@@ -364,35 +415,9 @@ function onPageChange(val) {
   });
 }
 
-async function loadProjectCount() {
-  try {
-    const q = query(collection(db, 'assets'), where('project', '==', selectedProject.value));
-    const snapshot = await getCountFromServer(q);
-    projectTotalCount.value = snapshot.data().count || 0;
-  } catch (e) {
-    console.warn('Failed to load project count:', e?.code || e);
-    projectTotalCount.value = null;
-  }
-}
+// REMOVED: loadProjectCount() - using reactive computed instead
 
-async function loadAllProjectCounts() {
-  try {
-    const names = new Set(KNOWN_PROJECTS);
-    names.add(selectedProject.value);
-    for (const a of assets.value) names.add(a.project || 'Spells of Genesis');
-    const updates = {};
-    for (const name of names) {
-      try {
-        const qn = query(collection(db, 'assets'), where('project', '==', name));
-        const snap = await getCountFromServer(qn);
-        updates[name] = snap.data().count || 0;
-      } catch (e) {
-        // ignore individual failures; keep previous value if any
-      }
-    }
-    projectCounts.value = { ...projectCounts.value, ...updates };
-  } catch {}
-}
+// REMOVED: loadAllProjectCounts() - using reactive computed instead
 
 async function loadNextBatch(reset = false) {
   if (loading.value) return;
@@ -501,9 +526,6 @@ function setupRealtimeListeners() {
     return;
   }
   
-  // Track recent updates to avoid duplicate processing
-  const recentUpdates = new Map(); // assetId -> timestamp
-  
   // Reset progress for smooth loading animation
   realtimeLoadingProgress.value = 0;
   
@@ -552,8 +574,8 @@ function setupRealtimeListeners() {
         
         // Handle incremental real-time changes (both initial and later)
         snapshot.docChanges().forEach((change) => {
-          // Skip initial load changes from cache (these are just local cache hits)
-          if (snapshot.metadata.fromCache && change.type === 'added') return;
+          // Skip initial load changes from cache only during initial load
+          if (snapshot.metadata.fromCache && change.type === 'added' && !initialLoaded.value) return;
           
           const data = { ...change.doc.data() };
           
@@ -581,15 +603,6 @@ function setupRealtimeListeners() {
               });
             }
           }
-          
-          // Skip duplicate updates within 2 seconds
-          const now = Date.now();
-          const lastUpdate = recentUpdates.get(assetId);
-          if (lastUpdate && (now - lastUpdate) < 2000) {
-            console.log(`⏭️ Skipping duplicate update for ${assetId} (${now - lastUpdate}ms ago)`);
-            return;
-          }
-          recentUpdates.set(assetId, now);
           
           console.log(`🔄 Real-time change: ${change.type} for asset ${assetId}${changedFields.length ? ' | Updated: ' + changedFields.join(', ') : ''}`);
           
@@ -663,6 +676,9 @@ function cleanupListeners() {
 }
 
 onMounted(async () => {
+  // 🔥 FIRST: Load project configuration from Firebase
+  await loadProjectConfig();
+  
   // Read ?project= from URL if present
   try {
     const url = new URL(window.location.href);
@@ -676,8 +692,12 @@ onMounted(async () => {
       } catch {}
     }
   } catch {}
-  // Load counts for all known/discovered projects (non-blocking)
-  loadAllProjectCounts().catch(() => {});
+  
+  // Ensure selectedProject is valid, fallback to first available project
+  if (!availableProjects.value.includes(selectedProject.value)) {
+    selectedProject.value = availableProjects.value[0] || 'Spells of Genesis';
+  }
+  
   // Restore page from localStorage
   try {
     const saved = localStorage.getItem('cpulse.currentPage');
@@ -686,11 +706,28 @@ onMounted(async () => {
       if (!Number.isNaN(n) && n > 0) currentPage.value = n;
     }
   } catch {}
-  // Load server count (for accurate %), then setup real-time listeners (no static load needed)
-  initialLoaded.value = false;
-  await loadProjectCount();
   
-  // 🔥 NEW: Use ONLY real-time listeners (no static load)
+  // 🔥 Load asset counts for ALL projects (for dropdown)
+  console.log('🔄 Loading asset counts for all projects...');
+  await loadAllProjectCounts();
+  
+  // 🔥 Load assets only for current project
+  console.log(`🔄 Loading assets for project: ${selectedProject.value}`);
+  try {
+    const q = query(collection(db, 'assets'), where('project', '==', selectedProject.value));
+    const snapshot = await getDocs(q);
+    const projectAssets = snapshot.docs.map(doc => ({ ...doc.data() }));
+    
+    console.log(`✅ Loaded ${projectAssets.length} assets for ${selectedProject.value}`);
+    assets.value = projectAssets;
+    assets.value.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    
+    initialLoaded.value = true;
+  } catch (e) {
+    console.error('❌ Failed to load assets:', e);
+    initialLoaded.value = true; // Show empty state instead of infinite loading
+  }
+  
   setupRealtimeListeners();
 });
 
@@ -704,33 +741,45 @@ watch(currentPage, (val) => {
   try { localStorage.setItem('cpulse.currentPage', String(val)); } catch {}
 });
 
-// On project change: fully reload with same loading experience as initial load
+// On project change: only load assets for new project (counts already loaded)
 watch(selectedProject, async () => {
+  console.log(`🔄 Switching to project: ${selectedProject.value}`);
+  
   currentPage.value = 1;
-  serverFilterSupported.value = true;
+  initialLoaded.value = false; // Show loading
   
-  // Always treat project switch like initial load for consistent UX
-  initialLoaded.value = false;
+  // Clear old assets immediately
+  assets.value = [];
   
-  // Clear assets for the old project immediately
-  assets.value = assets.value.filter(a => (a.project || 'Spells of Genesis') !== selectedProject.value);
-  
-  // 🔥 Clean up previous listeners before switching projects
+  // Clean up listeners
   cleanupListeners();
   
-  // Update URL param ?project=
+  // Update URL
   try {
     const url = new URL(window.location.href);
     if (selectedProject.value) url.searchParams.set('project', selectedProject.value);
     else url.searchParams.delete('project');
     window.history.replaceState({}, '', url.toString());
   } catch {}
-  // Refresh project counts (non-blocking) so dropdown shows accurate numbers
-  loadAllProjectCounts().catch(() => {});
-  await loadProjectCount();
   
-  // 🔥 NEW: Use ONLY real-time listeners for new project (no static load)
-  setupRealtimeListeners();
+  // 🔥 SIMPLIFIED: Just load assets for new project
+  try {
+    const q = query(collection(db, 'assets'), where('project', '==', selectedProject.value));
+    const snapshot = await getDocs(q);
+    const projectAssets = snapshot.docs.map(doc => ({ ...doc.data() }));
+    
+    console.log(`✅ Loaded ${projectAssets.length} assets for ${selectedProject.value}`);
+    assets.value = projectAssets;
+    assets.value.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    
+    initialLoaded.value = true;
+    
+    // Setup real-time listeners for new project
+    setupRealtimeListeners();
+  } catch (e) {
+    console.error('❌ Failed to load assets for new project:', e);
+    initialLoaded.value = true;
+  }
 });
 
 // Search only affects client-side filtering (everything is loaded)

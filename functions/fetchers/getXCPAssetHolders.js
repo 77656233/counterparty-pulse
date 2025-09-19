@@ -15,8 +15,20 @@ module.exports = async function(assetObj, config, project, serviceName, log) {
   const svcUpdatedField = (
     serviceName === "classic" ? "updatedClassic" : "updatedCounterparty"
   );
+  // Read existing document to preserve info/issuances
+  const docSnap = await docRef.get();
+  const existingData = docSnap.exists ? docSnap.data() : {};
+  const existingServiceData = (existingData.data &&
+    existingData.data[serviceName]) || {};
+
   await docRef.set({
-    data: {[serviceName]: {holders}},
+    data: {
+      ...existingData.data,
+      [serviceName]: {
+        ...existingServiceData,
+        holders,
+      },
+    },
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     [svcUpdatedField]: admin.firestore.FieldValue.serverTimestamp(),
   }, {merge: true});

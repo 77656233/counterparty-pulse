@@ -70,7 +70,7 @@
               :issuer="asset.data.classic?.info?.issuer"
               :divisible="classicStats(asset).divisible"
               :locked="!!classicStats(asset).locked"
-              :firstIssuanceTime="null"
+              :firstIssuanceTime="classicStats(asset).first_issuance_block_time"
             />
             <ClassicAssetSupplyProgress
               v-if="asset.data.classic?.info"
@@ -135,16 +135,26 @@ const hasClassic = computed(() => !!props.asset?.data?.classic);
 const activeTab = ref(hasCounterparty.value ? 'counterparty' : (hasClassic.value ? 'classic' : 'counterparty'));
 const showModal = ref(false);
 
-const counterpartyRaw = computed(() => props.asset.data.counterparty || {});
-const classicRaw = computed(() => props.asset.data.classic || {});
-const counterpartyStatsData = computed(() => getCounterpartyStats({
-  ...(counterpartyRaw.value.info || {}),
-  issuances: counterpartyRaw.value.issuances || []
-}));
-const classicStatsData = computed(() => getClassicStats({
-  ...(classicRaw.value.info || {}),
-  issuances: classicRaw.value.issuances || []
-}));
+const counterpartyRaw = computed(() => {
+  const data = props.asset.data.counterparty || {};
+  // Combine all data for stats functions (original structure)
+  return {
+    ...(data.info || {}),
+    holders: data.holders || [],
+    issuances: data.issuances || []
+  };
+});
+const classicRaw = computed(() => {
+  const data = props.asset.data.classic || {};
+  // Combine all data for stats functions (original structure)  
+  return {
+    ...(data.info || {}),
+    holders: data.holders || [],
+    issuances: data.issuances || []
+  };
+});
+const counterpartyStatsData = computed(() => getCounterpartyStats(counterpartyRaw.value));
+const classicStatsData = computed(() => getClassicStats(classicRaw.value));
 
 // Address burns calculation similar to AssetInfo
 const counterpartyAddressBurns = computed(() => calcAddressBurns(counterpartyRaw.value.holders || [], { divisible: counterpartyStatsData.value.divisible }));
