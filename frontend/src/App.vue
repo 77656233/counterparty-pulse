@@ -186,13 +186,18 @@ async function loadProjectConfig() {
   }
 }
 
-// Project list with counts (from config + server counts for ALL projects)
+// Project list with counts (reactive counts based on loaded assets)
 const projects = computed(() => {
   if (!configLoaded.value) return [];
   
   return availableProjects.value.map(projectName => {
-    // Use server count if available, otherwise 0 (will be loaded async)
-    const count = projectCounts.value[projectName] || 0;
+    // Count assets for this project from currently loaded assets
+    const loadedCount = assets.value.filter(a => (a.project || 'Spells of Genesis') === projectName).length;
+    
+    // Use loaded count if we have assets loaded for this project, otherwise use server count
+    const serverCount = projectCounts.value[projectName] || 0;
+    const count = loadedCount > 0 ? loadedCount : serverCount;
+    
     return { name: projectName, count };
   });
 });
@@ -664,6 +669,58 @@ function setupRealtimeListeners() {
   }
 }
 
+// Global real-time listener for all assets (to keep project counts updated)
+function setupGlobalAssetListener() {
+  try {
+    const colRef = collection(db, 'assets');
+    // Listen to ALL assets for project count updates
+    const globalQuery = query(colRef);
+    
+    const globalUnsubscribe = onSnapshot(globalQuery, 
+      (snapshot) => {
+        // Only handle incremental changes, not initial load
+        if (snapshot.metadata.fromCache) return;
+        
+        snapshot.docChanges().forEach((change) => {
+          const data = { ...change.doc.data() };
+          const assetId = data.asset || data.name || data.id || change.doc.id;
+          const assetProject = data.project || 'Spells of Genesis';
+          
+          if (change.type === 'added') {
+            // Check if this asset is for a different project than currently selected
+            if (assetProject !== selectedProject.value) {
+              // Add to assets array if not already there
+              const existingIndex = assets.value.findIndex(a => a.name === assetId);
+              if (existingIndex === -1) {
+                assets.value.push(data);
+                console.log(`🌍 Global: Added asset ${assetId} to project ${assetProject}`);
+              }
+            }
+          } else if (change.type === 'removed') {
+            // Remove from assets array if it exists
+            const index = assets.value.findIndex(a => a.name === assetId);
+            if (index !== -1) {
+              const newAssets = [...assets.value];
+              newAssets.splice(index, 1);
+              assets.value = newAssets;
+              console.log(`🌍 Global: Removed asset ${assetId} from project ${assetProject}`);
+            }
+          }
+          // Note: 'modified' changes are handled by the project-specific listener
+        });
+      },
+      (error) => {
+        console.warn('🌍 Global asset listener error:', error);
+      }
+    );
+    
+    _activeListeners.push(globalUnsubscribe);
+    
+  } catch (error) {
+    console.error('❌ Global asset listener setup error:', error);
+  }
+}
+
 function cleanupListeners() {
   _activeListeners.forEach(unsubscribe => {
     try {
@@ -729,6 +786,7 @@ onMounted(async () => {
   }
   
   setupRealtimeListeners();
+  setupGlobalAssetListener();
 });
 
 // Cleanup listeners on unmount
