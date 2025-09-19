@@ -17,13 +17,19 @@ module.exports = async function(asset, config, project, serviceName, log) {
   const svcUpdatedField = (
     serviceName === "classic" ? "updatedClassic" : "updatedCounterparty"
   );
-  await docRef.set({
+  // Merge asset info without overwriting holders/issuances
+  const updateData = {
     ...assetInfo,
-    ["data." + serviceName]: info,
-    offers: {opensea: [], counterparty: [], classic: []},
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     [svcUpdatedField]: admin.firestore.FieldValue.serverTimestamp(),
-  }, {merge: true});
+  };
+  
+  // Add each field individually to avoid overwriting entire data object
+  for (const [key, value] of Object.entries(info)) {
+    updateData[`data.${serviceName}.${key}`] = value;
+  }
+  
+  await docRef.set(updateData, {merge: true});
   const meta = {service: serviceName, project, asset: asset.name};
   if (log && log.info) log.info("assetInfo:written", meta);
   else console.log("assetInfo:written", meta);
