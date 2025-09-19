@@ -30,15 +30,15 @@
           </div>
           <div v-if="activeTab === 'counterparty' && hasCounterparty">
             <CounterpartyAssetMeta
-              v-if="asset.data.counterparty"
-              :issuer="asset.data.counterparty?.issuer"
+              v-if="asset.data.counterparty?.info"
+              :issuer="asset.data.counterparty?.info?.issuer"
               :divisible="counterpartyStats(asset).divisible"
               :locked="!!counterpartyStats(asset).locked"
             />
             <CounterpartyAssetSupplyProgress
-              v-if="asset.data.counterparty"
+              v-if="asset.data.counterparty?.info"
               :issuancesCount="counterpartyStats(asset).issuancesCount"
-              :supply="Number(asset.data.counterparty?.supply) || 0"
+              :supply="Number(asset.data.counterparty?.info?.supply) || 0"
               :burns="Number(counterpartyStats(asset).burns) || 0"
               :addressBurns="counterpartyAddressBurns"
               :availableSupply="counterpartyAvailableSupply"
@@ -49,9 +49,9 @@
               <div class="collapse-title text-sm font-semibold flex items-center min-h-[3.5rem]">Asset details</div>
               <div class="collapse-content">
                 <AssetDetailsTable
-                  :issuer="asset.data.counterparty?.issuer"
-                  :owner="asset.data.counterparty?.owner"
-                  :info="asset.data.counterparty?.description"
+                  :issuer="asset.data.counterparty?.info?.issuer"
+                  :owner="asset.data.counterparty?.info?.owner"
+                  :info="asset.data.counterparty?.info?.description"
                   :special="asset.special"
                 />
               </div>
@@ -66,16 +66,16 @@
           </div>
           <div v-else-if="activeTab === 'classic' && hasClassic">
             <ClassicAssetMeta
-              v-if="asset.data.classic"
-              :issuer="asset.data.classic?.issuer"
+              v-if="asset.data.classic?.info"
+              :issuer="asset.data.classic?.info?.issuer"
               :divisible="classicStats(asset).divisible"
               :locked="!!classicStats(asset).locked"
               :firstIssuanceTime="null"
             />
             <ClassicAssetSupplyProgress
-              v-if="asset.data.classic"
+              v-if="asset.data.classic?.info"
               :issuancesCount="classicStats(asset).issuancesCount"
-              :supply="Number(asset.data.classic?.supply) || 0"
+              :supply="Number(asset.data.classic?.info?.supply) || 0"
               :burns="Number(classicStats(asset).burns) || 0"
               :addressBurns="classicAddressBurns"
               :availableSupply="classicAvailableSupply"
@@ -86,9 +86,9 @@
               <div class="collapse-title text-sm font-semibold flex items-center min-h-[3.5rem]">Asset details</div>
               <div class="collapse-content">
                 <AssetDetailsTable
-                  :issuer="asset.data.classic?.issuer"
-                  :owner="asset.data.classic?.owner"
-                  :info="asset.data.classic?.description"
+                  :issuer="asset.data.classic?.info?.issuer"
+                  :owner="asset.data.classic?.info?.owner"
+                  :info="asset.data.classic?.info?.description"
                   :special="asset.special"
                 />
               </div>
@@ -137,8 +137,14 @@ const showModal = ref(false);
 
 const counterpartyRaw = computed(() => props.asset.data.counterparty || {});
 const classicRaw = computed(() => props.asset.data.classic || {});
-const counterpartyStatsData = computed(() => getCounterpartyStats(counterpartyRaw.value));
-const classicStatsData = computed(() => getClassicStats(classicRaw.value));
+const counterpartyStatsData = computed(() => getCounterpartyStats({
+  ...(counterpartyRaw.value.info || {}),
+  issuances: counterpartyRaw.value.issuances || []
+}));
+const classicStatsData = computed(() => getClassicStats({
+  ...(classicRaw.value.info || {}),
+  issuances: classicRaw.value.issuances || []
+}));
 
 // Address burns calculation similar to AssetInfo
 const counterpartyAddressBurns = computed(() => calcAddressBurns(counterpartyRaw.value.holders || [], { divisible: counterpartyStatsData.value.divisible }));

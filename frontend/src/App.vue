@@ -180,8 +180,8 @@ function aggFirstIssuanceTs(a) {
 }
 
 function aggSupply(a) {
-  const sc = Number(a?.data?.counterparty?.supply) || 0;
-  const sl = Number(a?.data?.classic?.supply) || 0;
+  const sc = Number(a?.data?.counterparty?.info?.supply) || 0;
+  const sl = Number(a?.data?.classic?.info?.supply) || 0;
   return Math.max(sc, sl);
 }
 
@@ -192,14 +192,14 @@ function aggHolders(a) {
 }
 
 function aggDivisible(a) {
-  const dc = !!a?.data?.counterparty?.divisible;
-  const dl = !!a?.data?.classic?.divisible;
+  const dc = !!a?.data?.counterparty?.info?.divisible;
+  const dl = !!a?.data?.classic?.info?.divisible;
   return dc || dl;
 }
 
 function aggLocked(a) {
-  const lc = !!a?.data?.counterparty?.locked;
-  const ll = !!a?.data?.classic?.locked;
+  const lc = !!a?.data?.counterparty?.info?.locked;
+  const ll = !!a?.data?.classic?.info?.locked;
   return lc || ll;
 }
 
@@ -207,12 +207,12 @@ function aggLocked(a) {
 import { calcAddressBurns } from "./utils/addressBurns.js";
 const _availCache = new Map();
 function aggAvailableSupply(a) {
-  const cs = Number(a?.data?.counterparty?.supply) || 0;
+  const cs = Number(a?.data?.counterparty?.info?.supply) || 0;
   const ch = Array.isArray(a?.data?.counterparty?.holders) ? a.data.counterparty.holders : [];
-  const cd = !!a?.data?.counterparty?.divisible;
-  const ls = Number(a?.data?.classic?.supply) || 0;
+  const cd = !!a?.data?.counterparty?.info?.divisible;
+  const ls = Number(a?.data?.classic?.info?.supply) || 0;
   const lh = Array.isArray(a?.data?.classic?.holders?.data) ? a.data.classic.holders.data : [];
-  const ld = !!a?.data?.classic?.divisible;
+  const ld = !!a?.data?.classic?.info?.divisible;
   const key = `${a.name}|${cs}|${ch.length}|${cd}|${ls}|${lh.length}|${ld}`;
   if (_availCache.has(key)) return _availCache.get(key);
   const cBurns = calcAddressBurns(ch, { divisible: cd });
