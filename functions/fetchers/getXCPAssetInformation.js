@@ -23,12 +23,12 @@ module.exports = async function(asset, config, project, serviceName, log) {
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     [svcUpdatedField]: admin.firestore.FieldValue.serverTimestamp(),
   };
-  
+
   // Add each field individually to avoid overwriting entire data object
   for (const [key, value] of Object.entries(info)) {
     updateData[`data.${serviceName}.${key}`] = value;
   }
-  
+
   await docRef.set(updateData, {merge: true});
   const meta = {service: serviceName, project, asset: asset.name};
   if (log && log.info) log.info("assetInfo:written", meta);
